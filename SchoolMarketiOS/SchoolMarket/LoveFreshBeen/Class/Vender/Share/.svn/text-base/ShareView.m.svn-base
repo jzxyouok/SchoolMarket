@@ -1,0 +1,123 @@
+//
+//  ShareView.m
+//  OldWine
+//
+//  Created by Doramical on 15/11/6.
+//  Copyright © 2015年 GZLC. All rights reserved.
+//
+
+#import "ShareView.h"
+#import "PostDetailShareView.h"
+#import "CommonTool.h"
+#import "LoginSharedBtn.h"
+#define share_label_height 16
+
+@interface ShareView() <PostDetailShareViewDelegate>
+@property(nonatomic,strong)PostDetailShareView *share;
+@end
+@implementation ShareView
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.backgroundColor = [UIColor whiteColor];
+        self.bounds = CGRectMake(0, 0, ScreenWidth, 0);
+        [self setupSubviews];
+    }
+    return self;
+}
+//- (CGFloat)deviation
+//{
+//    return share_label_height/2;
+//}
+-(void)setupSubviews
+{
+    PostDetailShareView *share = [CommonTool createSimpleViewToTargetSuperView:self viewClass:[PostDetailShareView class]];
+    share.delegate = self;
+    self.share = share;
+    [self.share  mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.equalTo(@100);
+        make.top.equalTo(self).offset(16);
+        make.left.right.equalTo(self);
+    }];
+    
+  
+    UIView *line = [CommonTool createSimpleViewToTargetSuperView:self viewClass:[UIView class]];
+    line.backgroundColor = MainLineGrayColor;
+    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.equalTo(@0.5);
+        make.top.equalTo(share.mas_bottom).offset(1);
+        make.right.left.equalTo(self);
+    }];
+
+    UILabel *cancel = [CommonTool createSimpleViewToTargetSuperView:self viewClass:[UILabel class]];
+    cancel.font = [UIFont systemFontOfSize:15];
+    cancel.userInteractionEnabled = YES;
+    cancel.textColor = MainTextGrayColor;
+    cancel.text = @"取 消";
+    cancel.textAlignment = 1;
+    [cancel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(line.mas_bottom);
+        make.left.right.bottom.equalTo(self);
+        make.height.equalTo(@50);
+    }];
+    
+    UITapGestureRecognizer *cancelTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(dismiss)];
+    [cancel addGestureRecognizer:cancelTap];
+}
+-(void)postDetailShareViewdidSelectAct:(LoginSharedBtn *)btn
+{
+    [self.delegate onClickLoginSharedBtnHandeler:btn];
+}
+
+-(void)show
+{
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    UIView *bgView = [[UIView alloc]initWithFrame:window.bounds];
+    bgView.backgroundColor = MainDimBackgroundColor;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(dismissView:)];
+    [bgView addGestureRecognizer:tap];
+    self.bounds = CGRectMake(0.0f, 0.0f, 999, 999.0f);
+    [self setNeedsUpdateConstraints];
+    [self updateConstraintsIfNeeded];
+    CGFloat height = [self systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    self.frame = CGRectMake(0, CGRectGetHeight(bgView.frame), window.bounds.size.width, height);
+    [window addSubview:bgView];
+    [bgView addSubview:self];
+}
+-(void)willMoveToSuperview:(UIView *)newSuperview
+{
+    [UIView animateWithDuration:0.2f animations:^{
+        CGRect rect = self.frame;
+        rect.origin.y -= rect.size.height;
+        self.frame = rect;
+    }];
+}
+
+-(void)dismissView:(UITapGestureRecognizer *)tap
+{
+    CGPoint point = [tap locationInView:tap.view];
+    if (!CGRectContainsPoint(self.frame, point)) {
+        [self dismiss];
+    }
+}
+
+-(void)dismiss
+{
+    [UIView animateWithDuration:0.5f animations:^{
+        CGRect rect = self.frame;
+        rect.origin.y += rect.size.height;
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [self.superview removeFromSuperview];
+        }
+    }];
+    
+}
+
+- (void)configTitle:(NSString *)title {
+    [self.share configTitle:title];
+}
+@end

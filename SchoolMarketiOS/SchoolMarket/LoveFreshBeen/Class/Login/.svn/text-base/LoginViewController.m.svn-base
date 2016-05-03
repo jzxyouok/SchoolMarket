@@ -1,0 +1,485 @@
+//
+//  LoginViewController.m
+//  PillBox
+//
+//  Created by Doramical on 16/3/30.
+//  Copyright © 2016年 同學. All rights reserved.
+//
+
+#import "LoginViewController.h"
+#import "UINavigationBar+BackgroundColor.h"
+#import "NSString+VericationTool.h"
+#import "LoginService.h"
+#import "LoginItems.h"
+#import "LCAccount.h"
+#import "RecoverPWViewController.h"
+#import "RegisterGuideViewController.h"
+#import "AppDelegate.h"
+#import "LoginConstants.h"
+#import "NSString+MD5Tool.h"
+#import "HomeMainViewController.h" //首页
+#import "RSAEncryptor.h"
+//shareSDK
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKConnector/ShareSDKConnector.h>
+
+@interface LoginViewController ()<UITextFieldDelegate>
+{
+    LoginType type;
+    BOOL canSubmit;
+}
+
+@property (weak, nonatomic) IBOutlet UIButton *loginBtn;
+@property (weak, nonatomic) IBOutlet UIButton *registerBtn;
+@property (nonatomic, weak) UITextField *mobileField;
+@property (nonatomic, weak) UITextField *pwField;
+//提交动画
+@property (nonatomic, weak) UIImageView *submitBtnAnimationImageView;
+@property (nonatomic, weak) UILabel *submitBtnAnimationLabel;
+//当前表单所有 UITextField
+@property (nonatomic, strong) NSArray<UITextField *> *textfieldArrayArray;
+
+//注册按钮底部到底部的距离
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *height;
+//注册按钮提示文字的距离
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *space;
+
+@end
+
+@implementation LoginViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setupNavigationItemLLVC];
+    [self setupSubviewsLocalLogin];
+    [self setLeftNavigationItemImage:@"icon_back" highlightImage:nil selector:@selector(backAction)];
+}
+
+- (void)setupNavigationItemLLVC
+{
+    self.title = @"登录";
+}
+
+- (void)setupSubviewsLocalLogin
+{
+    if (ScreenHeight <= 568) {  //适配5s
+        self.height.constant -= 80;
+        self.space.constant -= 30;
+    }
+    
+    UIView *bgView = [CommonTool createSimpleViewToTargetSuperView:self.view viewClass:[UIView class]];
+    bgView.backgroundColor = [UIColor whiteColor];
+    [bgView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.view).offset(62 + (is_IOS7?64:0));
+        make.left.equalTo(self.view).offset(50);
+        make.right.equalTo(self.view).offset(-50);
+        make.bottom.equalTo(self.view).offset(-(self.height.constant + 120));
+        make.height.equalTo(@96);
+    }];
+    
+    
+    UITextField *mobileField = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UITextField class]];
+    mobileField.font = [UIFont systemFontOfSize:15];
+    mobileField.keyboardType = UIKeyboardTypeNumberPad;
+    mobileField.attributedPlaceholder = [[NSAttributedString alloc]initWithString:@"输入手机号/邮箱号" attributes:@{NSFontAttributeName:mobileField.font,NSForegroundColorAttributeName:MainTextLightGrayColor}];
+    mobileField.textColor = MainTextLightGrayColor;
+    [mobileField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.right.equalTo(bgView);
+        make.height.equalTo(@45);
+    }];
+    self.mobileField = mobileField;
+    self.mobileField.delegate = self;
+    
+    mobileField.leftViewMode = UITextFieldViewModeAlways;
+    UIView *leftView_mobile = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 46)];
+    UIImageView *imgView1 = [CommonTool createSimpleViewToTargetSuperView:leftView_mobile viewClass:[UIImageView class]];
+    imgView1.image = [UIImage imageNamed:@"icon_phone"];
+    [imgView1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(20, 20));
+        make.centerY.centerX.equalTo(leftView_mobile);
+    }];
+    mobileField.leftView = leftView_mobile;
+    
+    UIView *line1 = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UIView class]];
+    line1.backgroundColor = [UIColor colorWithHex:0xcccccc];
+    [line1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(mobileField.mas_bottom);
+        make.left.right.equalTo(bgView);
+        make.height.equalTo(@0.5);
+    }];
+    
+    UITextField *captcha = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UITextField class]];
+    captcha.attributedPlaceholder = [[NSAttributedString alloc]initWithString:@"输入密码" attributes:@{NSFontAttributeName:mobileField.font,NSForegroundColorAttributeName:MainTextLightGrayColor}];
+    self.pwField = captcha;
+    self.pwField.delegate = self;
+    captcha.textColor = MainTextLightGrayColor;
+    [captcha mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.bottom.equalTo(bgView);
+        make.top.equalTo(line1.mas_bottom);
+    }];
+    captcha.secureTextEntry = YES;
+    captcha.font = mobileField.font;
+    captcha.leftViewMode = UITextFieldViewModeAlways;
+    captcha.rightViewMode = UITextFieldViewModeAlways;
+    UIView *leftView_capthca = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 50)];
+    UIImageView *imgView2 = [CommonTool createSimpleViewToTargetSuperView:leftView_capthca viewClass:[UIImageView class]];
+    imgView2.image = [UIImage imageNamed:@"icon_password"];
+    [imgView2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(20, 20));
+        make.centerY.centerX.equalTo(leftView_capthca);
+    }];
+    captcha.leftView = leftView_capthca;
+    
+    captcha.rightViewMode = UITextFieldViewModeAlways;
+    UILabel *forgetLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 75, 46)];
+    forgetLabel.font = [UIFont systemFontOfSize:13];
+    forgetLabel.text = @"忘记密码";
+    forgetLabel.textAlignment = NSTextAlignmentCenter;
+    forgetLabel.textColor = [UIColor colorWithHex:0xff66a6];
+    forgetLabel.userInteractionEnabled = YES;
+    captcha.rightView = forgetLabel;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(resetPSW)];
+    [forgetLabel addGestureRecognizer:tap];
+    
+    UIView *line2 = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UIView class]];
+    line2.backgroundColor = [UIColor colorWithHex:0xcccccc];
+    [line2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(captcha.mas_bottom);
+        make.left.right.equalTo(bgView);
+        make.height.equalTo(@0.5);
+    }];
+
+    
+    self.loginBtn.layer.cornerRadius = 5;
+    self.registerBtn.layer.cornerRadius = 5;
+    self.registerBtn.layer.borderColor = MainTextGrayColor.CGColor;
+    self.registerBtn.layer.borderWidth = 0.8;
+    _textfieldArrayArray = @[_mobileField, _pwField];
+    [self setupUITextFieldDidChangeNotification:_textfieldArrayArray];
+    [self.loginBtn setBackgroundImage:[UIImage imageWithColor:[UIColor whiteColor]] forState:UIControlStateHighlighted];
+    self.loginBtn.layer.masksToBounds =  YES;
+    self.registerBtn.layer.masksToBounds = YES;
+    self.loginBtn.adjustsImageWhenHighlighted = NO;
+    self.loginBtn.showsTouchWhenHighlighted = NO;
+}
+
+#pragma mark - 添加 UITextField 文本改变通知
+- (void)setupUITextFieldDidChangeNotification:(NSArray<UITextField *> *)textFieldArray {
+    NSInteger count = textFieldArray.count;
+    
+    for (int i = 0; i < count; ++i) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(textFieldTextDidChange:)
+                                                     name:UITextFieldTextDidChangeNotification
+                                                   object:textFieldArray[i]];
+    }
+}
+
+#pragma mark - UITextField 文字改变
+-(void)textFieldTextDidChange:(NSNotification *)notification
+{
+    [self checkCanSubmit];
+}
+
+#pragma mark - 检测是否可以做提交动作，当表单中所有元素的字符都达到要求时才可以提交，这时按钮颜色会变亮
+- (void)checkCanSubmit {
+    canSubmit = YES;
+    
+    NSInteger count = _textfieldArrayArray.count;
+    
+    for (int i = 0; i < count; ++i) {
+        NSRange range = [_textfieldArrayArray[i].placeholder rangeOfString:@"密码"];
+        NSInteger min = 1;
+        if (range.location != NSNotFound) {
+            min = 1;
+        }
+        
+        if (_textfieldArrayArray[i].text.length < min) {
+            canSubmit = NO;
+            break;
+        }
+    }
+    
+    [self setSubmitBtnStatus];
+}
+
+#pragma mark - 改变提交表单按钮的状态
+- (void)setSubmitBtnStatus {
+    if (canSubmit) {
+        self.loginBtn.enabled = YES;
+        self.loginBtn.backgroundColor = MainThemeColor;
+//        [self.loginBtn setTitleColor:MainTextBlackColor forState:UIControlStateNormal];
+    } else {
+        self.loginBtn.backgroundColor = [UIColor colorWithHex:0x8ab3e6];
+//        [self.loginBtn setTitleColor:MainUnableTextColor forState:UIControlStateNormal];
+        self.loginBtn.enabled = NO;
+    }
+}
+
+#pragma mark- actions
+
+- (IBAction)loginAct:(id)sender {
+    
+    if (![self.mobileField.text isMobileNumber]) {
+        [MBProgressHUD showError:@"输入的手机号有误" toView:self.view];
+        return;
+    }
+    
+    if (self.pwField.text.length < 6 && self.pwField.text.length > 16) {
+        [MBProgressHUD showError:@"请输入6-16位密码" toView:self.view];
+        return;
+    }
+    
+    [self submitBtnAnimation];
+    [self.view endEditing:YES];
+//    [MBProgressHUD showLoadingViewWithoutDim:@"登录中..." toView:self.view];
+    [LoginService loginWithParam:@{@"username":_mobileField.text,@"password":[RSAEncryptor rsaEncryptString:_pwField.text]} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+        [self handleWithObject:responseObject];
+        [self submitBtnNoAnimation];
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        [MBProgressHUD showError:errDescription toView:self.view delay:1];
+        [self submitBtnNoAnimation];
+    }];
+}
+
+- (IBAction)WXLogin:(id)sender {
+    type = LoginTypeWeiXin;
+    [ShareSDK getUserInfo:SSDKPlatformTypeWechat
+           onStateChanged:^(SSDKResponseState state, SSDKUser *user, NSError *error)
+     {
+         if (state == SSDKResponseStateSuccess)
+         {
+             //             MBProgressHUD
+//             NSDictionary *paramDic = @{@"type":@(LoginTypeWeiXin), @"username":self.mobileField.text, @"password":[self.pwField.text encryptMD5String],@"device_id" : [JPUSHService registrationID]};
+             [LoginService loginWithParam:@{} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+                 
+             } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+                 
+             }];
+             
+                          NSLog(@"第三方登录点击 - 微信 - 成功");
+                          NSLog(@"uid=%@",user.uid);
+                          NSLog(@"token=%@",user.credential.token);
+                          NSLog(@"%@",user.credential);
+                          NSLog(@"nickname=%@",user.nickname);
+         }
+         else
+         {
+             [MBProgressHUD showTipMessag:@"登录出错" toView:self.view];
+             NSLog(@"%@",error);
+         }
+         
+     }];
+}
+
+- (IBAction)QQLogin:(id)sender {
+    type = LoginTypeQQ;
+}
+
+- (IBAction)WBLogin:(id)sender {
+    type = LoginTypeWeiBo;
+}
+- (IBAction)ALLogin:(id)sender {
+}
+
+//- (IBAction)popBack:(id)sender
+//{
+//    [self.navigationController popViewControllerAnimated:YES];
+//}
+
+- (void)resetPSW
+{
+    [self.view endEditing:YES];
+    UIStoryboard *guideBoard = [UIStoryboard storyboardWithName:@"Login" bundle:[NSBundle mainBundle]];
+    RecoverPWViewController *guide = [guideBoard instantiateViewControllerWithIdentifier:@"ResetPSW"];
+    guide.operationType = OperationTypeRecoverPW;
+    [self.navigationController pushViewController:guide animated:YES];
+}
+
+#pragma mark - 注册
+- (IBAction)registerAction:(id)sender {
+    [self.view endEditing:YES];
+    UIStoryboard *guideBoard = [UIStoryboard storyboardWithName:@"Login" bundle:[NSBundle mainBundle]];
+    RecoverPWViewController *con = [guideBoard instantiateViewControllerWithIdentifier:@"ResetPSW"];
+    con.operationType = OperationTypeRegister;
+    [self.navigationController pushViewController:con animated:YES];
+}
+
+#pragma mark- handle
+
+#pragma mark - 提交按钮处理中动画
+- (void)submitBtnAnimation {
+    if (!_submitBtnAnimationLabel) {
+        UILabel *label = [UILabel new];
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor whiteColor];
+        label.font = [UIFont systemFontOfSize:12];
+        label.text = @"登录中...";
+        _submitBtnAnimationLabel = label;
+        [self.loginBtn addSubview:label];
+        [_submitBtnAnimationLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.equalTo(self.loginBtn);
+            make.centerX.equalTo(self.loginBtn).offset(8);
+        }];
+    }
+    if (!_submitBtnAnimationImageView) {
+        UIImageView *imgView = [UIImageView new];
+        imgView.backgroundColor = self.loginBtn.backgroundColor;
+        [self.loginBtn setTitle:@"" forState:UIControlStateNormal];
+        [self.loginBtn addSubview:imgView];
+        _submitBtnAnimationImageView = imgView;
+        [_submitBtnAnimationImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.equalTo(self.loginBtn);
+            make.right.equalTo(_submitBtnAnimationLabel.mas_left).offset(-4);
+        }];
+        
+        _submitBtnAnimationImageView.contentMode = UIViewContentModeCenter;
+        _submitBtnAnimationImageView.animationImages = [CommonTool getLoadingImgArrayWithName:@"loading_s_white_" andNum:31];
+        _submitBtnAnimationImageView.animationRepeatCount = 0;
+        _submitBtnAnimationImageView.animationDuration = LOADING_ANIMATION_DURATION;
+    }
+    
+    //    wantShowHUD = NO;
+    _submitBtnAnimationImageView.hidden = NO;
+    _submitBtnAnimationLabel.hidden = NO;
+    self.loginBtn.userInteractionEnabled = NO;
+    [_submitBtnAnimationImageView startAnimating];
+}
+
+#pragma mark - 提交按钮非处理中
+- (void)submitBtnNoAnimation {
+    _submitBtnAnimationImageView.hidden = YES;
+    _submitBtnAnimationLabel.hidden = YES;
+    [self.loginBtn setTitle:@"登录" forState:UIControlStateNormal];
+    self.loginBtn.userInteractionEnabled = YES;
+    [_submitBtnAnimationImageView stopAnimating];
+}
+#pragma mark- handle
+- (void)handleWithObject:(NSArray *)object
+{
+    LCAccount *act = [LCAccount sharedInstance];
+    LoginItems *items = object.firstObject;
+    if ([CommonTool requestSuccess:items.ret_code])
+    {
+        act.sessionId = items.data.session_id;
+        act.userId  = items.data.u_id;
+        act.mobileNum = self.mobileField.text;
+        act.logined = YES;
+        //如果是第一次登录，则去完善资料页
+        if ([items.data.is_first integerValue])
+        {
+            [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+            UIStoryboard *guideBoard = [UIStoryboard storyboardWithName:@"Login" bundle:[NSBundle mainBundle]];
+            RegisterGuideViewController *guide = [guideBoard instantiateViewControllerWithIdentifier:@"guide"];
+            [self.navigationController pushViewController:guide animated:YES];
+        }
+        else
+        {
+//            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+            //去获取用户数据
+            [self getMedicineIDs];
+//            [self getUserProfile];
+//            [self dismissViewControllerAnimated:YES completion:NULL];
+        }
+    }
+    else
+    {
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        [MBProgressHUD showError:items.err toView:self.view];
+    }
+    
+}
+
+#pragma mark - 获取用户信息
+- (void)getUserProfile {
+    [LoginService getUserProfileWithSuccessfulBlock:^(NSArray *responseObject, double timeStamp) {
+        
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        
+    }];
+}
+//获取我的药箱的药品id
+- (void)getMedicineIDs {
+    [LoginService getMyMedicineListWithSuccessfulBlock:^(NSArray *responseObject, double timeStamp) {
+        BaseVerificationModel *model = responseObject.firstObject;
+        if ([CommonTool requestSuccess:model.ret_code]) {
+            NSLog(@"获取我的药箱药品ids成功");
+            LCAccount *act = [LCAccount sharedInstance];
+            act.m_ids = model.data.m_ids;
+            [self dismissViewControllerAnimated:YES completion:NULL];
+        }else {
+            NSLog(@"获取我的药箱药品ids失败");
+        }
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+         NSLog(@"获取我的药箱药品ids失败");
+    }];
+    
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    [self.view endEditing:YES];
+}
+
+#pragma mark- text field delegate
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    //    if ([string isEmptyOrNull] )
+    //    {
+    //        return NO;
+    //    }
+    if ([string isEqualToString:@" "])
+    {
+        return NO;
+    }
+    if (textField == self.mobileField)
+    {
+        if (![string isAllNum])
+        {
+            return NO;
+        }
+        if (textField.text.length == Mobile_MaxNumber && ![string isEqualToString:@""])
+        {
+            return NO;
+        }
+    }
+    else
+    {
+        if (textField.text.length == PW_MaxNumber && ![string isEqualToString:@""])
+        {
+            SHOW_ERR(@"密码最大为16位")
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+- (void)backAction {
+//    if (self.navigationController)
+//    {
+//        [self.navigationController popViewControllerAnimated:YES];
+//        return;
+//    }
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

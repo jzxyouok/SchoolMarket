@@ -1,0 +1,120 @@
+//
+//  PostDetailShareView.m
+//  OldWine
+//
+//  Created by HuZeSen on 15/8/25.
+//  Copyright (c) 2015年 GZLC. All rights reserved.
+//
+
+#import "PostDetailShareView.h"
+#import "UIView+EqualPadding.h"
+#import "LoginSharedBtn.h"
+
+#define share_label_height 16
+@interface PostDetailShareView()
+{
+    
+}
+@property(nonatomic,strong) UILabel *shareLabel;
+@end
+@implementation PostDetailShareView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self)
+    {
+        // 自身高度为100,已设定好了
+        [self setupSubviewsPDSV:nil];
+    }
+    return self;
+}
+
+- (instancetype)initWithTarget:(id)target
+{
+    self = [super init];
+    if (self)
+    {
+        [self setupSubviewsPDSV:target];
+    }
+    return self;
+}
+
+- (CGFloat)deviation
+{
+    return share_label_height/2;
+}
+
+- (void)setupSubviewsPDSV:(id)target
+{
+    UIView *topView = self;
+    CGFloat viewLabel_Height = share_label_height;
+    
+    UILabel *shareLabel = [[UILabel alloc]init];
+    [self addSubview:shareLabel];
+    shareLabel.font = [UIFont systemFontOfSize:16];
+    shareLabel.textAlignment = NSTextAlignmentCenter;
+    shareLabel.textColor = [UIColor colorWithHex:0x333333];
+    shareLabel.backgroundColor = [UIColor whiteColor];
+    self.shareLabel = shareLabel;
+    [self.shareLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.mas_centerX);
+        make.size.mas_equalTo(CGSizeMake(68, viewLabel_Height));
+        make.top.equalTo(topView).offset(-viewLabel_Height/2 + 5);
+    }];
+    
+    NSArray *iconNameArr = nil;
+    NSArray * nameArr    = nil;
+//    if ([[[UIDevice currentDevice] systemVersion] floatValue] > 8.0) {
+//        if (![WXApi isWXAppInstalled] || ![QQApiInterface isQQInstalled]) {
+//            NSLog(@"为安装微信orQQ");
+//        } else {
+//            iconNameArr = @[@"ico_weixin_share",@"ico_moments_share",@"ico_weibo_share",@"ico_qzone_share"];
+//            nameArr     = @[@"微信好友",@"微信朋友圈",@"微博",@"QQ空间"];
+//        }
+//    } else {
+        iconNameArr = @[@"icon_share_wechat",@"icon_share_moment",@"icon_share_weibo",@"icon_share_qq"];
+        nameArr     = @[@"微信好友",@"微信朋友圈",@"微博",@"QQ空间"];
+//    }
+    
+//    NSArray *iconNameArr = @[@"ico_weixin_share",@"ico_moments_share",@"ico_weibo_share",@"ico_qzone_share"];
+//    NSArray *nameArr = @[@"微信好友",@"微信朋友圈",@"微博",@"QQ空间"];
+    UIView *leftView = self;
+    for (int i = 0; i < iconNameArr.count; i ++)
+    {
+        LoginSharedBtn *btn = [[LoginSharedBtn alloc]initWithImageName:iconNameArr[i] LabelText:nameArr[i]];
+        btn.label.textColor = MainTextBlackColor;
+        [self addSubview:btn];
+        btn.tag = i + 1;
+        [btn addTarget:self action:@selector(share:) forControlEvents:UIControlEventTouchUpInside];
+        btn.label.font = [UIFont systemFontOfSize:12];
+        [btn mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(i?leftView.mas_right:leftView).offset(10);
+            make.centerY.equalTo(self).offset(viewLabel_Height/2);
+            if (i)
+            {
+                make.width.equalTo(leftView);
+            }
+            if (i == iconNameArr.count - 1)
+            {
+                make.right.equalTo(self).offset(-10);
+            }
+        }];
+        leftView = btn;
+    }
+}
+
+- (void)share:(UIControl *)control
+{
+    LoginSharedBtn *btn = (LoginSharedBtn *)control.superview;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ShareActNotificationString object:@(btn.tag)];
+    if ([self.delegate respondsToSelector:@selector(postDetailShareViewdidSelectAct:)])
+    {
+        [self.delegate postDetailShareViewdidSelectAct:(LoginSharedBtn *)control.superview];
+    }
+}
+
+- (void)configTitle:(NSString *)title {
+    self.shareLabel.text = title;
+}
+@end

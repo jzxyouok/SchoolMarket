@@ -1,0 +1,21 @@
+//
+//  LoginViewController.h
+//  PillBox
+//
+//  Created by Doramical on 16/3/30.
+//  Copyright © 2016年 同學. All rights reserved.
+//
+
+#import "BaseViewController.h"
+
+typedef NS_ENUM(NSInteger, LoginType)
+{
+    LoginTypeNormal = 1,
+    LoginTypeWeiXin ,
+    LoginTypeQQ ,
+    LoginTypeWeiBo
+};
+
+@interface LoginViewController : BaseViewController
+
+@end

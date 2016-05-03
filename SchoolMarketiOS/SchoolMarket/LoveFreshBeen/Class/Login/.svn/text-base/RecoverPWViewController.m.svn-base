@@ -1,0 +1,531 @@
+//
+//  RecoverPWViewController.m
+//  PillBox
+//
+//  Created by Doramical on 16/3/30.
+//  Copyright © 2016年 同學. All rights reserved.
+//
+
+#import "RecoverPWViewController.h"
+#import "UINavigationBar+BackgroundColor.h"
+#import "RegisterGuideViewController.h"
+#import "LoginService.h"
+#import "NSString+VericationTool.h"
+#import "NSString+MD5Tool.h"
+#import "LoginConstants.h"
+#import "RegisterItems.h"
+#import "RSAEncryptor.h"
+
+@interface RecoverPWViewController ()<UITextFieldDelegate>
+{
+    BOOL canSubmit;
+}
+@property (nonatomic, weak) UITextField *mobileField;
+@property (nonatomic, weak) UITextField *captchaField;
+@property (nonatomic, weak) UITextField *pwField;
+@property (nonatomic, weak) UIButton *captchaBtn;
+//提交动画
+@property (nonatomic, weak) UIImageView *submitBtnAnimationImageView;
+@property (nonatomic, weak) UILabel *submitBtnAnimationLabel;
+
+@property (nonatomic, strong) NSArray<UITextField *> *textfieldArrayArray;
+@property (weak, nonatomic) IBOutlet UIButton *confirmBtn;
+
+@end
+
+@implementation RecoverPWViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setTitle];
+    // Do any additional setup after loading the view.
+    [self setLeftNavigationItemImage:@"icon_back" highlightImage:nil selector:@selector(backAction)];
+    [self setupNavigationItemRPSW];
+    [self setupSubviewsRPSW];
+}
+
+- (void)setupNavigationItemRPSW
+{
+    self.confirmBtn.layer.cornerRadius = 5;
+    self.confirmBtn.clipsToBounds = YES;
+}
+
+- (void)setTitle {
+    switch (self.operationType) {
+        case OperationTypeRegister:
+            self.title = @"注册";
+            [self.confirmBtn setTitle:@"立即注册" forState:0];
+            break;
+        case OperationTypeResetPW:
+            self.title = @"重置密码";
+            [self.confirmBtn setTitle:@"确定" forState:0];
+            break;
+        case OperationTypeRecoverPW:
+            self.title = @"修改密码";
+            [self.confirmBtn setTitle:@"确定" forState:0];
+            break;
+        default:
+            break;
+    }
+}
+- (void)setupSubviewsRPSW
+{
+    UIView *bgView = [CommonTool createSimpleViewToTargetSuperView:self.view viewClass:[UIView class]];
+    bgView.backgroundColor = [UIColor whiteColor];
+    [bgView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.view).offset(62);
+        make.bottom.equalTo(self.confirmBtn.mas_top).offset(-21);
+        make.left.equalTo(self.view).offset(23);
+        make.right.equalTo(self.view).offset(-23);
+        make.height.equalTo(@145);
+    }];
+    bgView.layer.cornerRadius = 5;
+    
+    UITextField *mobileField = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UITextField class]];
+    mobileField.font = [UIFont systemFontOfSize:14];
+    //    mobileField.placeholder = @"输入手机号";
+    mobileField.attributedPlaceholder = [[NSAttributedString alloc]initWithString:@"输入手机号" attributes:@{NSFontAttributeName:mobileField.font,NSForegroundColorAttributeName:MainTextLightGrayColor}];
+    self.mobileField = mobileField;
+    self.mobileField.delegate = self;
+    mobileField.textColor = MainTextLightGrayColor;
+    [mobileField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.right.equalTo(bgView);
+        make.height.equalTo(@45);
+    }];
+    mobileField.keyboardType = UIKeyboardTypeNumberPad;
+    mobileField.leftViewMode = UITextFieldViewModeAlways;
+    UIView *leftView_mobile = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 46)];
+    UIImageView *imgView1 = [CommonTool createSimpleViewToTargetSuperView:leftView_mobile viewClass:[UIImageView class]];
+    imgView1.image = [UIImage imageNamed:@"icon_phone"];
+    [imgView1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(20, 20));
+        make.centerY.centerX.equalTo(leftView_mobile);
+    }];
+    mobileField.leftView = leftView_mobile;
+    
+    UIView *line1 = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UIView class]];
+    line1.backgroundColor = [UIColor colorWithHex:0xcccccc];
+    [line1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(mobileField.mas_bottom);
+        make.left.right.equalTo(bgView);
+        make.height.equalTo(@0.5);
+    }];
+    
+    UITextField *captcha = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UITextField class]];
+    captcha.attributedPlaceholder = [[NSAttributedString alloc]initWithString:@"输入验证码" attributes:@{NSFontAttributeName:mobileField.font,NSForegroundColorAttributeName:mobileField.textColor}];
+    self.captchaField = captcha;
+    self.captchaField.delegate = self;
+    self.captchaField.keyboardType = UIKeyboardTypeNumberPad;
+    captcha.textColor = mobileField.textColor;
+    [captcha mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(bgView);
+        make.top.equalTo(line1.mas_bottom);
+        make.height.equalTo(@50);
+    }];
+    captcha.font = mobileField.font;
+    captcha.leftViewMode = UITextFieldViewModeAlways;
+    captcha.rightViewMode = UITextFieldViewModeAlways;
+    UIView *leftView_capthca = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 50)];
+    UIImageView *imgView2 = [CommonTool createSimpleViewToTargetSuperView:leftView_capthca viewClass:[UIImageView class]];
+    imgView2.image = [UIImage imageNamed:@"icon_verify"];
+    [imgView2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(20, 20));
+        make.centerY.centerX.equalTo(leftView_capthca);
+    }];
+    captcha.leftView = leftView_capthca;
+    
+    UIView *rightView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 100, 50)];
+    UIButton *captchaBtn = [CommonTool createSimpleViewToTargetSuperView:rightView viewClass:[UIButton class]];
+    [captchaBtn setTitle:@"获取验证码" forState:0];
+    self.captchaBtn = captchaBtn;
+    captchaBtn.layer.cornerRadius = 5;
+    captchaBtn.layer.borderColor = [UIColor colorWithHex:0x2e81e5].CGColor;
+    captchaBtn.layer.borderWidth = 0.8;
+    [captchaBtn setTitleColor:[UIColor colorWithHex:0x2e81e5] forState:0];
+    [captchaBtn addTarget:self action:@selector(getCaptcha:) forControlEvents:1<<6];
+    captchaBtn.titleLabel.font = [UIFont systemFontOfSize:13];
+    captchaBtn.layer.masksToBounds = YES;
+//    [captchaBtn setBackgroundImage:[UIImage imageWithColor:[[UIColor whiteColor]colorWithAlphaComponent:0.4]] forState:0];
+//    [captchaBtn setBackgroundImage:[UIImage imageWithColor:[UIColor whiteColor]] forState:UIControlStateHighlighted];
+    [captchaBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(80, 30));
+        make.centerX.centerY.equalTo(rightView);
+    }];
+    captcha.rightView = rightView;
+    
+    UIView *line2 = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UIView class]];
+    line2.backgroundColor = line1.backgroundColor;
+    [line2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(captcha.mas_bottom);
+        make.left.right.equalTo(bgView);
+        make.height.equalTo(@0.5);
+    }];
+    
+    UITextField *pwField = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UITextField class]];
+    pwField.attributedPlaceholder = [[NSAttributedString alloc]initWithString:@"设置密码" attributes:@{NSFontAttributeName:mobileField.font,NSForegroundColorAttributeName:mobileField.textColor}];
+    self.pwField = pwField;
+    self.pwField.delegate = self;
+    pwField.font = captcha.font;
+    pwField.secureTextEntry = YES;
+    pwField.textColor = mobileField.textColor;
+    [pwField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.bottom.equalTo(bgView);
+        make.top.equalTo(line2.mas_bottom);
+    }];
+    pwField.leftViewMode = UITextFieldViewModeAlways;
+    pwField.rightViewMode = UITextFieldViewModeAlways;
+    UIView *leftView_psw = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 46)];
+    UIImageView *imgView3 = [CommonTool createSimpleViewToTargetSuperView:leftView_psw viewClass:[UIImageView class]];
+    imgView3.image = [UIImage imageNamed:@"icon_password"];
+    [imgView3 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(20, 20));
+        make.centerY.centerX.equalTo(leftView_psw);
+    }];
+    pwField.leftView = leftView_psw;
+    
+    UIView *rightView_pw = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 50, 48)];
+    UILabel *show_label = [CommonTool createSimpleViewToTargetSuperView:rightView_pw viewClass:[UILabel class]];
+    show_label.text = @"显示";
+    show_label.userInteractionEnabled = YES;
+    show_label.textAlignment = NSTextAlignmentCenter;
+    show_label.font = [UIFont systemFontOfSize:13];
+    //    label.backgroundColor = [[UIColor whiteColor]colorWithAlphaComponent:0.4];
+    show_label.textColor = [UIColor colorWithHex:0xff66a6];
+    [show_label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(30, 14));
+        make.centerX.centerY.equalTo(rightView_pw);
+    }];
+    show_label.layer.cornerRadius = 5;
+    pwField.rightView = rightView_pw;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(showPSW:)];
+    [show_label addGestureRecognizer:tap];
+    
+    UIView *line3 = [CommonTool createSimpleViewToTargetSuperView:bgView viewClass:[UIView class]];
+    line3.backgroundColor = line1.backgroundColor;
+    [line3 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(pwField.mas_bottom);
+        make.left.right.equalTo(bgView);
+        make.height.equalTo(@0.5);
+    }];
+    
+    _textfieldArrayArray = @[_mobileField, _captchaField, _pwField];
+    [self setupUITextFieldDidChangeNotification:_textfieldArrayArray];
+}
+#pragma mark - 提交按钮处理中动画
+- (void)submitBtnAnimation {
+    if (!_submitBtnAnimationLabel) {
+        UILabel *label = [UILabel new];
+        label.backgroundColor = [UIColor clearColor];
+        label.textColor = [UIColor whiteColor];
+        label.font = [UIFont systemFontOfSize:12];
+        label.text = @"注册中...";
+        _submitBtnAnimationLabel = label;
+        [self.confirmBtn addSubview:label];
+        [_submitBtnAnimationLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.equalTo(self.confirmBtn);
+            make.centerX.equalTo(self.confirmBtn).offset(8);
+        }];
+    }
+    if (!_submitBtnAnimationImageView) {
+        UIImageView *imgView = [UIImageView new];
+        imgView.backgroundColor = self.confirmBtn.backgroundColor;
+        [self.confirmBtn setTitle:@"" forState:UIControlStateNormal];
+        [self.confirmBtn addSubview:imgView];
+        _submitBtnAnimationImageView = imgView;
+        [_submitBtnAnimationImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.equalTo(self.confirmBtn);
+            make.right.equalTo(_submitBtnAnimationLabel.mas_left).offset(-4);
+        }];
+        
+        _submitBtnAnimationImageView.contentMode = UIViewContentModeCenter;
+        _submitBtnAnimationImageView.animationImages = [CommonTool getLoadingImgArrayWithName:@"loading_s_white_" andNum:31];
+        _submitBtnAnimationImageView.animationRepeatCount = 0;
+        _submitBtnAnimationImageView.animationDuration = LOADING_ANIMATION_DURATION;
+    }
+    
+    //    wantShowHUD = NO;
+    _submitBtnAnimationImageView.hidden = NO;
+    _submitBtnAnimationLabel.hidden = NO;
+    self.confirmBtn.userInteractionEnabled = NO;
+    [_submitBtnAnimationImageView startAnimating];
+}
+
+
+#pragma mark - 添加 UITextField 文本改变通知
+- (void)setupUITextFieldDidChangeNotification:(NSArray<UITextField *> *)textFieldArray {
+    NSInteger count = textFieldArray.count;
+    
+    for (int i = 0; i < count; ++i) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(textFieldTextDidChange:)
+                                                     name:UITextFieldTextDidChangeNotification
+                                                   object:textFieldArray[i]];
+    }
+}
+
+#pragma mark - UITextField 文字改变
+-(void)textFieldTextDidChange:(NSNotification *)notification
+{
+    [self checkCanSubmit];
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if ([string isEqualToString:@" "])
+    {
+        return NO;
+    }
+    if (textField == self.mobileField)
+    {
+        if (![string isAllNum])
+        {
+            return NO;
+        }
+        if (textField.text.length == Mobile_MaxNumber && ![string isEqualToString:@""])
+        {
+            return NO;
+        }
+    }
+    else
+    {
+        if (textField.text.length == PW_MaxNumber && ![string isEqualToString:@""])
+        {
+            SHOW_ERR(@"密码最大为16位")
+            return NO;
+        }
+    }
+    return YES;
+    
+}
+#pragma mark - 检测是否可以做提交动作，当表单中所有元素的字符都达到要求时才可以提交，这时按钮颜色会变亮
+- (void)checkCanSubmit {
+    canSubmit = YES;
+    
+    NSInteger count = _textfieldArrayArray.count;
+    
+    for (int i = 0; i < count; ++i) {
+        NSRange range = [_textfieldArrayArray[i].placeholder rangeOfString:@"密码"];
+        NSInteger min = 1;
+        if (range.location != NSNotFound) {
+            min = 1;
+        }
+        
+        if (_textfieldArrayArray[i].text.length < min) {
+            canSubmit = NO;
+            break;
+        }
+    }
+    
+    [self setSubmitBtnStatus];
+}
+
+#pragma mark - 改变提交表单按钮的状态
+- (void)setSubmitBtnStatus {
+    if (canSubmit) {
+        self.confirmBtn.backgroundColor = MainThemeColor;
+        [self.confirmBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.confirmBtn.enabled = YES;
+    } else {
+        self.confirmBtn.backgroundColor = [UIColor colorWithHex:0x8ab3e6];;
+        [self.confirmBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.confirmBtn.enabled = NO;
+    }
+}
+
+#pragma mark - 提交按钮非处理中
+- (void)submitBtnNoAnimation {
+    _submitBtnAnimationImageView.hidden = YES;
+    _submitBtnAnimationLabel.hidden = YES;
+    [self setTitle];
+//    [self.confirmBtn setTitle:@"登录" forState:UIControlStateNormal];
+    self.confirmBtn.userInteractionEnabled = YES;
+    [_submitBtnAnimationImageView stopAnimating];
+}
+
+#pragma mark- actions
+- (IBAction)confirmAction:(id)sender {
+    
+    if ([self.mobileField.text isEmptyOrNull] ||
+        ![self.mobileField.text isMobileNumber] ||
+        [self.pwField.text isEmptyOrNull])
+    {
+        [MBProgressHUD showError:@"输入信息有误" toView:self.view];
+        return;
+    }
+    [self submitBtnAnimation];
+    [self.confirmBtn setTitle:@"" forState:UIControlStateNormal];
+    [self.view endEditing:YES];
+    
+    switch (self.operationType) {
+        case OperationTypeRegister:
+            [self registerAction];
+            break;
+        case OperationTypeResetPW:
+            NSLog(@"修改密码");
+            break;
+        case OperationTypeRecoverPW:
+            
+            break;
+        default:
+            break;
+    }
+
+    //    [MBProgressHUD showLoadingViewWithoutDim:@"登录中..." toView:self.view];
+//    NSDictionary *dic = @{
+//                          @"username":self.mobileField.text,
+//                          @"password":[self.pwField.text encryptMD5String],
+//                          @"sms":self.captchaField.text
+//                          };
+//    [LoginService changePasswordWithParam:dic successfulBlock:^(NSArray *responseObject, double timeStamp) {
+//        //        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+//        BaseVerificationModel *model = responseObject.firstObject;
+//        if ([CommonTool requestSuccess:model.ret_code])
+//        {
+//            [MBProgressHUD showSuccess:@"修改成功" toView:self.view];
+//            [self backAction];
+//        }
+//        else
+//        {
+//            [MBProgressHUD showError:NSLocalizedString(model.err, nil) toView:self.view];
+//            [self submitBtnNoAnimation];
+//        }
+//        
+//        //        [self submitBtnNoAnimation];
+//    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+//        //        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+//        [MBProgressHUD showError:errDescription toView:self.view delay:1];
+//        [self submitBtnNoAnimation];
+//    }];
+    
+}
+
+- (void)getCaptcha:(UIButton *)sender
+{
+    if (![self.mobileField.text isMobileNumber])
+    {
+        [MBProgressHUD showError:@"输入的手机号码有误" toView:self.view];
+        return;
+    }
+    
+//    if (self.pwField.text.length < 6 && self.pwField.text.length > 16) {
+//        [MBProgressHUD showError:@"请输入6-16位密码" toView:self.view];
+//    }
+    
+//    
+//    [LoginService getSMSWithoutCheckMobile:@{@"type":@(CaptchaTypeResetPW),@"username":self.mobileField.text} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+//        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+//        BaseVerificationModel *model  = responseObject.firstObject;
+//        if (![CommonTool requestSuccess:model.ret_code])
+//        {
+//            [MBProgressHUD showError:model.err toView:self.view];
+//        }
+//        else
+//        {
+//            [self countdown:sender];
+//        }
+//        
+//    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+//        [MBProgressHUD showError:errDescription toView:self.view];
+//    }];
+    
+    [LoginService getSMSWithParam:@{@"type":@(_operationType),@"username":self.mobileField.text} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        BaseVerificationModel *model  = responseObject.firstObject;
+        if (![CommonTool requestSuccess:model.ret_code])
+        {
+            [MBProgressHUD showError:model.err toView:self.view];
+        }
+        else
+        {
+            [self countdown:sender];
+        }
+
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        [MBProgressHUD showError:errDescription toView:self.view];
+    }];
+}
+
+//倒计时
+- (void)countdown:(UIButton *)sender {
+    __block int timeout = 59; //倒计时时间
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    __block dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,queue);
+    dispatch_source_set_timer(timer, dispatch_walltime(NULL, 0), 1.0 * NSEC_PER_SEC, 0); //每秒执行
+    dispatch_source_set_event_handler(timer, ^{
+        if(timeout <= 0){ //倒计时结束，关闭
+            dispatch_source_cancel(timer);
+            timer = nil;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //设置界面的按钮显示 根据自己需求设置
+                sender.userInteractionEnabled = YES;
+                [sender setTitle:@"获取验证码" forState:0];
+                
+            });
+        }else{
+            
+            int seconds = timeout % 60;
+            NSString *strTime = [NSString stringWithFormat:@"%.2d", seconds];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                sender.userInteractionEnabled = NO;
+                [sender setTitle:strTime forState:0];
+            });
+            timeout--;
+        }
+    });
+    dispatch_resume(timer);
+}
+
+- (void)showPSW:(UITapGestureRecognizer *)tap
+{
+    UILabel *label = (UILabel *)tap.view;
+    self.pwField.secureTextEntry = !self.pwField.secureTextEntry;
+    label.text = self.pwField.secureTextEntry?@"显示":@"隐藏";
+    [self.view endEditing:YES];
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - 网络请求
+- (void)registerAction {
+    [LoginService registerWithParam:@{@"sms":_captchaField.text?_captchaField.text:@"",@"username":_mobileField.text,@"password":[RSAEncryptor rsaEncryptString:_pwField.text]} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+        RegisterItems *items = responseObject.firstObject;
+        RegisterItem *item = items.data;
+        if ([CommonTool requestSuccess:items.ret_code]) {
+            LCAccount *act = [LCAccount sharedInstance];
+            act.sessionId = item.session_id;
+//            act.userId = [item.u_id integerValue];
+            act.mobileNum = _mobileField.text;
+            act.logined = YES;
+            //注册引导页
+            UIStoryboard *loginStoryboard = [UIStoryboard storyboardWithName:@"Login" bundle:nil];
+            RegisterGuideViewController *con = [loginStoryboard instantiateViewControllerWithIdentifier:@"guide"];
+            [self.navigationController pushViewController:con animated:YES];
+        }
+        else
+        {
+            [MBProgressHUD showTipMessag:items.err toView:self.view];
+            [self submitBtnNoAnimation];
+        }
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+        [self submitBtnNoAnimation];
+    }];
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

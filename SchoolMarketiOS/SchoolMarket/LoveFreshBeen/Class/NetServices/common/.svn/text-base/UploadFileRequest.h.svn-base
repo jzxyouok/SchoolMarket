@@ -1,0 +1,31 @@
+//
+//  UploadFileRequest.h
+//  fish
+//
+//  Created by HuZeSen on 15/12/14.
+//  Copyright © 2015年 GZLC. All rights reserved.
+//
+
+#import "BaseRequest.h"
+
+typedef NS_ENUM(NSInteger, UploadFileType)
+{
+    //体检报告
+    UploadFileTypeReport     = 1,
+    //处方单
+    UploadFileTypeRecipe     = 2,
+    //病例
+    UploadFileTypeCase       = 3,
+    UploadFileTypeNOne
+};
+
+@interface UploadFileRequest : BaseRequest
+
+- (instancetype)initWithImage:(UIImage *)image;
+- (instancetype)initWithVideoURL:(NSURL *)videoURL;
+
+//- (instancetype)initWithVideo:()
+- (void)setupUploadImageType:(UploadFileType)type ownerId:(NSInteger)o_id fileIndex:(NSInteger)index;
+
+- (void)setupUploadVideoWithOwnerId:(NSInteger)o_id;
+@end

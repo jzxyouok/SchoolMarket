@@ -1,0 +1,29 @@
+//
+//  PostDetailShareView.h
+//  OldWine
+//
+//  Created by HuZeSen on 15/8/25.
+//  Copyright (c) 2015年 GZLC. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+@class LoginSharedBtn;
+@protocol PostDetailShareViewDelegate <NSObject>
+@required
+- (void)postDetailShareViewdidSelectAct:(LoginSharedBtn *)btn;
+
+@end
+
+static NSString *ShareActNotificationString = @"shareAct";
+@interface PostDetailShareView : UIView
+/**
+ *  设置标题
+ *
+ *  @param title 标题
+ */
+- (void)configTitle:(NSString *)title;
+// 修正偏差. 若要设置视图距离某个视图上间距x时,为了达到效果,则应设置offset为 x+deviation;
+@property (nonatomic, readonly) CGFloat deviation;
+@property (nonatomic ,weak) id<PostDetailShareViewDelegate> delegate;
+//@property (nonatomic, weak) UIImageView *shareImageView;
+@end

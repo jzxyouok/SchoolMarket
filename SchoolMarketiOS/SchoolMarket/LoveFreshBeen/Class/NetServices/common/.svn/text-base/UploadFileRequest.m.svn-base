@@ -1,0 +1,87 @@
+//
+//  UploadFileRequest.m
+//  fish
+//
+//  Created by HuZeSen on 15/12/14.
+//  Copyright © 2015年 GZLC. All rights reserved.
+//
+
+#import "UploadFileRequest.h"
+#import "LCAccount.h"
+#import "LCAssetLibrary.h"
+
+@implementation UploadFileRequest
+{
+    UIImage *_image;
+    NSString *_requestUrl;
+    id _argument;
+    NSURL *_videoURL;
+}
+
+#pragma mark- 图片
+- (instancetype)initWithImage:(UIImage *)image {
+    self = [super init];
+    if (self) {
+        _image = image;
+    }
+    return self;
+}
+
+#pragma mark- 视频
+- (instancetype)initWithVideoURL:(NSURL *)videoURL
+{
+    self = [super init];
+    if (self)
+    {
+        _videoURL = videoURL;
+    }
+    return self;
+}
+
+- (NSString *)requestUrl{
+    return _requestUrl;
+}
+
+- (AFConstructingBlock)constructingBodyBlock {
+    return ^(id<AFMultipartFormData> formData) {
+        NSData *data = nil;
+        NSString *name = nil;
+        NSString *type = nil;
+        if (_image)
+        {
+            data = UIImageJPEGRepresentation(_image, 0.5);
+            name = @"name.jpg";
+            type = @"image/jpeg";
+        }
+        else if(_videoURL)
+        {
+            data = [LCAssetLibrary getDataWithVideoURL:_videoURL];
+            name = @"name.mp4";
+            type = @"video/mp4";
+        }
+        NSString *formKey = @"file";
+        [formData appendPartWithFileData:data name:formKey fileName:name mimeType:type];
+    };
+}
+
+- (void)setupUploadImageType:(UploadFileType)type ownerId:(NSInteger)o_id fileIndex:(NSInteger)index
+{
+    LCAccount *act = [LCAccount sharedInstance];
+    NSString *appendingString = [NSString stringWithFormat:@"?service=upload&session_id=%@&type=%ld&indice=%ld&owner_id=%ld",act.sessionId,type,index,o_id];
+    _requestUrl = appendingString;
+    NSLog(@"-------%@",appendingString);
+//    _image = image;
+}
+
+//- (void)setupUploadVideoWithOwnerId:(NSInteger)o_id
+//{
+//    LCAccount *act = [LCAccount sharedInstance];
+//    NSString *appendingString = [NSString stringWithFormat:@"?service=upload&session_id=%@&type=%ld&indice=%d&owner_id=%ld",act.sessionId,UploadFileTypeTimeLineVideo,2,o_id];
+//    _requestUrl = appendingString;
+////    if (imgURLString)
+////    {
+////        _image = [UIImage imageWithContentsOfFile:imgURLString];
+////    }
+//}
+
+@end

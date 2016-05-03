@@ -1,0 +1,326 @@
+//
+//  RegisterGuideViewController.m
+//  PillBox
+//
+//  Created by Doramical on 16/3/30.
+//  Copyright © 2016年 同學. All rights reserved.
+//
+
+#import "RegisterGuideViewController.h"
+#import "DatePickerView.h"
+#import "LoginService.h"
+#import "HomeMainViewController.h"
+#import "MLTransition.h"
+@interface RegisterGuideViewController () <UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,DatePickerViewDelegate>
+{
+    //记录选中标签的个数
+    NSInteger count;
+    //年龄时间戳
+    NSInteger ageTimeStamp;
+}
+
+@property (nonatomic, weak) UICollectionView *collectionView;
+//健康信息数据
+@property (nonatomic, strong) NSMutableArray *infoArr;
+@property (nonatomic, strong) NSMutableArray *idArr;
+@property (nonatomic, strong) NSMutableArray *selectArr;
+//初次见面到顶部约束
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *top;
+//健康信息到年龄底部的约束
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *space;
+
+@property (weak, nonatomic) IBOutlet UIButton *femaleBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *malebtn;
+
+@property (weak, nonatomic) IBOutlet UILabel *ageLabel;
+
+@property (weak, nonatomic) IBOutlet UIButton *confirmBtn;
+//健康信息的容器
+@property (weak, nonatomic) IBOutlet UIView *container;
+@end
+
+@implementation RegisterGuideViewController
+
+- (void)viewDidLoad {
+
+    [super viewDidLoad];
+    [self configData];
+    [self setupCollectionView];
+    //调整在不同尺寸屏幕上的约束
+    [self updateConstraints];
+    // Do any additional setup after loading the view.
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)configData {
+    NSLog(@"屏幕高度:%F",ScreenHeight);
+    //禁掉手势
+    [self.navigationController enabledMLTransition:NO];
+    UIView *view = [[UIView alloc] init];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:view];
+    count = 0;
+    //默认是1981-01-01
+    ageTimeStamp = 315504000;
+    
+    
+}
+- (void)setupCollectionView {
+    self.selectArr = [[NSMutableArray alloc] initWithCapacity:0];
+    self.infoArr = [[NSMutableArray alloc] initWithObjects:@"冠心病",@"性功能障碍",@"肝炎",@"糖尿病",@"抑郁症",@"肝癌",@"风偏瘫",@"肾虚", nil];
+    self.idArr = [[NSMutableArray alloc] initWithArray:@[@"1293",@"2281",@"332",@"4306",@"5238",@"6332",@"7218",@"8433",@"9143"]];
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+    _collectionView = collectionView;
+    _collectionView.scrollEnabled = NO;
+    _collectionView.dataSource = self;
+    _collectionView.delegate = self;
+    _collectionView.backgroundColor = [UIColor whiteColor];
+    [_collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+    [_container addSubview:_collectionView];
+    [_collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(_container);
+    }];
+}
+
+- (void)updateConstraints {
+    if (ScreenHeight == 480) {  //4s下
+        self.top.constant -= 60;
+        self.space.constant -= 20;
+    }else if (ScreenHeight == 568) { //5s
+        self.top.constant -= 40;
+    }else if (ScreenHeight == 667) { //6、6s
+        self.top.constant += 20;
+        self.space.constant += 20;
+    }else if (ScreenHeight == 736) { //6+、6s+
+        self.top.constant += 40;
+        self.space.constant += 80;
+    }
+    //性别选择按钮，默认选中男
+    self.malebtn.selected = YES;
+    self.malebtn.layer.cornerRadius = 5;
+    self.femaleBtn.layer.cornerRadius = 5;
+    self.malebtn.clipsToBounds = YES;
+    self.femaleBtn.clipsToBounds = YES;
+    [self.malebtn setTitleColor:MainTextBlackColor forState:UIControlStateNormal];
+    [self.malebtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    [self.femaleBtn setTitleColor:MainTextBlackColor forState:UIControlStateNormal];
+    [self.femaleBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    [self.femaleBtn setImage:[UIImage imageNamed:@"icon_female_0"] forState:UIControlStateNormal];
+    [self.femaleBtn setImage:[UIImage imageNamed:@"icon_female_1"] forState:UIControlStateSelected];
+    [self.malebtn setImage:[UIImage imageNamed:@"icon_male_0"] forState:UIControlStateNormal];
+    [self.malebtn setImage:[UIImage imageNamed:@"icon_male_1"] forState:UIControlStateSelected];
+    
+    [self.malebtn setBackgroundColor:self.malebtn.selected?MainThemeColor:[UIColor clearColor]];
+    self.malebtn.layer.borderColor = MainThemeColor.CGColor;
+    self.malebtn.layer.borderWidth = 0.8;
+    
+    [self.femaleBtn setBackgroundColor:self.femaleBtn.selected?[UIColor colorWithHex:0xff66a6]:[UIColor clearColor]];
+    self.femaleBtn.layer.borderColor = [UIColor colorWithHex:0xff66a6].CGColor;
+    self.femaleBtn.layer.borderWidth = 0.8;
+    
+    self.confirmBtn.layer.cornerRadius = 5;
+}
+
+#pragma mark - collectionView 
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return self.infoArr.count > 9?9:self.infoArr.count;
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    if (ScreenHeight == 480) {  //4s下
+        return 10;
+    }else if (ScreenHeight == 667) { //6、6s
+        return 20;
+    }else if (ScreenHeight == 736) { //6+、6s+
+        return 20;
+
+    }
+    return 20;
+}
+
+
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    CGFloat with = _container.frame.size.width/3 - 10;
+    CGFloat height = with/3 > 30 ? with/3 : 30;
+    return CGSizeMake(with,height);
+}
+
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+    UIButton *button = [[UIButton alloc] init];
+    button.tag = indexPath.item;
+    [button setTitle:self.infoArr[indexPath.item] forState:UIControlStateNormal];
+    [button setTitleColor:MainTextGrayColor forState:UIControlStateNormal];
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    button.titleLabel.textAlignment = 1;
+    button.clipsToBounds = YES;
+    [button setBackgroundColor:[UIColor whiteColor]];
+    button.layer.borderWidth = 0.8;
+    button.layer.borderColor = MainTextGrayColor.CGColor;
+    button.titleLabel.font = [UIFont systemFontOfSize:12];
+    button.layer.cornerRadius = 4.0;
+    [button addTarget:self action:@selector(infoTapAction:) forControlEvents:1<<6];
+    [cell.contentView addSubview:button];
+    [button mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(cell.contentView);
+    }];
+    
+    return cell;
+}
+
+- (void)infoTapAction:(UIButton *)button {
+    button.selected = !button.selected;
+    if (button.selected) {
+        count ++;
+    }else {
+        count --;
+        [self.selectArr removeObject:self.idArr[button.tag]];
+        count = count<0?0:count;
+    }
+    if (count > 3) {
+        count = 3;
+        button.selected = NO;
+    }
+    if (button.selected) {
+        [self.selectArr addObject:self.idArr[button.tag]];
+        NSLog(@"选中了第%lu个标签",button.tag);
+    }
+    [button setBackgroundColor:button.selected?[UIColor colorWithHex:0xff66a6]:[UIColor whiteColor]];
+    button.layer.borderWidth = 0.8;
+    button.layer.borderColor = button.selected?[UIColor clearColor].CGColor:MainTextGrayColor.CGColor;
+    
+}
+#pragma mark - actions
+
+- (IBAction)maleAction:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    if (btn.selected) {
+        return;
+    }
+    self.malebtn.selected = !btn.selected;
+    self.femaleBtn.selected = !self.malebtn.selected;
+    [self.femaleBtn setBackgroundColor:self.femaleBtn.selected?[UIColor colorWithHex:0xff66a6]:[UIColor clearColor]];
+    [self.malebtn setBackgroundColor:self.malebtn.selected?MainThemeColor:[UIColor clearColor]];
+}
+
+- (IBAction)femaleAction:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    if (btn.selected) {
+        return;
+    }
+    self.femaleBtn.selected = !btn.selected;
+    self.malebtn.selected = !self.malebtn.selected;
+    [self.femaleBtn setBackgroundColor:self.femaleBtn.selected?[UIColor colorWithHex:0xff66a6]:[UIColor clearColor]];
+    [self.malebtn setBackgroundColor:self.malebtn.selected?MainThemeColor:[UIColor clearColor]];
+}
+
+- (IBAction)prePage:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    NSLog(@"%@",btn.currentTitle);
+}
+
+- (IBAction)nextPage:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    NSLog(@"%@",btn.currentTitle);
+}
+
+- (IBAction)selectAge:(id)sender {
+    NSLog(@"选择年龄");
+    DatePickerView *picker = [[DatePickerView alloc] init];
+    NSDate *minDate = [NSDate dateWithString:@"1920-01-01" format:@"yyyy-MM-dd"];
+    picker.minDate = minDate;
+    NSDate *maxDate = [NSDate dateWithString:@"1998-01-01" format:@"yyyy-MM-dd"];
+    picker.maxDate = maxDate;
+    picker.date = [NSDate dateWithString:@"1980-01-01" format:@"yyyy-MM-dd"];
+    picker.pickerMode = UIDatePickerModeDate;
+    picker.delegate = self;
+    [picker show];
+}
+
+- (IBAction)confirmAction:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    NSLog(@"%@",btn.currentTitle);
+    LCAccount *act = [LCAccount sharedInstance];
+    if (!self.selectArr.count) {
+        [MBProgressHUD showError:@"请至少选择一个关注信息" toView:self.view];
+        return;
+    }
+    NSString *ids = @"";
+    for (int i = 0; i < self.selectArr.count; i ++) {
+        ids = [ids stringByAppendingString:self.selectArr[i]];
+        if (i != self.selectArr.count - 1) {
+            ids = [ids stringByAppendingString:@","];
+        }
+    }
+    [LoginService registerGuideWithParam:@{@"ids":ids,@"gender":_malebtn.selected?@1:@2,@"age":@(ageTimeStamp)} successfulBlock:^(NSArray *responseObject, double timeStamp) {
+        BaseVerificationModel *model = responseObject.firstObject;
+        if ([CommonTool requestSuccess:model.ret_code]) {
+            [self getMedicineIDs];
+        }
+        else {
+            act.sessionId = @"";
+            [MBProgressHUD showTipMessag:model.err toView:self.view];
+        }
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        act.sessionId = @"";
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+    }];
+}
+
+#pragma mark - 获取用户信息
+- (void)getUserProfile {
+    [LoginService getUserProfileWithSuccessfulBlock:^(NSArray *responseObject, double timeStamp) {
+        
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        
+    }];
+}
+//获取我的药箱的药品id
+- (void)getMedicineIDs {
+    [LoginService getMyMedicineListWithSuccessfulBlock:^(NSArray *responseObject, double timeStamp) {
+        BaseVerificationModel *model = responseObject.firstObject;
+        if ([CommonTool requestSuccess:model.ret_code]) {
+            NSLog(@"获取我的药箱药品ids成功");
+            LCAccount *act = [LCAccount sharedInstance];
+            act.m_ids = model.data.m_ids;
+            [self dismissViewControllerAnimated:YES completion:NULL];
+        }else {
+            NSLog(@"获取我的药箱药品ids失败");
+        }
+    } failedBlock:^(NSString *errDescription, NSInteger errCode) {
+        NSLog(@"获取我的药箱药品ids失败");
+    }];
+    
+}
+
+#pragma mark -  DatePickerViewDelegate
+- (void)getTimeString:(NSString *)timeString timeStampForSelectedTime:(NSInteger)timeStamp andDatePickerView:(DatePickerView *)view{
+    self.ageLabel.text = timeString;
+    ageTimeStamp = timeStamp;
+}
+
+- (void)backAction {
+    return;
+}
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

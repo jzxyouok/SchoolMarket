@@ -1,0 +1,31 @@
+//
+//  ShareView.h
+//  OldWine
+//
+//  Created by Doramical on 15/11/6.
+//  Copyright © 2015年 GZLC. All rights reserved.
+//
+
+#import "LoginSharedBtn.h"
+//#import "PostDetailShareView.h"
+
+@protocol ShareViewDelegate <NSObject>
+  @optional
+/**
+ *  点击邀请好友对应图标的处理事件
+ *
+ *  @param btn 对应图标
+ */
+-(void)onClickLoginSharedBtnHandeler:(LoginSharedBtn *)btn;
+@end
+
+@interface ShareView : UIView
+@property (nonatomic, strong) id<ShareViewDelegate> delegate;
+/**
+ *  指定标题
+ *
+ */
+- (void)configTitle:(NSString *)title;
+-(void)show;
+-(void)dismiss;
+@end
