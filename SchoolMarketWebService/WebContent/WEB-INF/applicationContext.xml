@@ -11,7 +11,7 @@
 	<!-- 定义数据源Bean，使用C3P0数据源实现，并注入数据源的必要信息 -->
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close" p:driverClass="com.mysql.jdbc.Driver"
-		p:jdbcUrl="jdbc:mysql://localhost:3306/usertest" p:user="root"
+		p:jdbcUrl="jdbc:mysql://localhost:3306/SchoolMarket" p:user="root"
 		p:password="123456" p:maxPoolSize="40" p:minPoolSize="2"
 		p:initialPoolSize="2" p:maxIdleTime="30" />
 	<!-- 定义Hibernate的SessionFactory，SessionFactory需要依赖数据源，注入dataSource -->
@@ -41,11 +41,14 @@
 		</property>
 	</bean>
 
-	<bean id="userService" class="com.hungxum.User.service.impl.UserServiceImpl"
+	<!-- service中所有的dao类注册 -->
+	<bean id="service" class="com.SMWebSer.service.impl.ServiceImpl"
 		p:userDao-ref="userDao"></bean>
 	<!-- 定义DAO组件，并将SessionFactory注入DAO组件 -->
-	<bean id="userDao" class="com.hungxum.User.dao.impl.UserDaoHibernate4"
+	<bean id="userDao" class="com.SMWebSer.dao.impl.UserDaoHibernate"
 		p:sessionFactory-ref="sessionFactory" />
+
+
 
 	<!-- 配置Hibernate的局部事务管理器，使用HibernateTransactionManager类 -->
 	<!-- 该类是PlatformTransactionManager接口针对采用Hibernate的特定实现类 -->
@@ -72,7 +75,7 @@
 
 	<aop:config>
 		<!-- 配置一个切入点 -->
-		<aop:pointcut id="myPointcut" expression="bean(userService)" />
+		<aop:pointcut id="myPointcut" expression="bean(service)" />
 		<!-- 指定在myPointcut切入点应用txAdvice事务增强处理 -->
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="myPointcut" />
 	</aop:config>
