@@ -102,8 +102,7 @@ class SettingViewController: BaseViewController {
     
     // MARK: - Action
     func aboutMeViewClick() {
-        let aboutVc = AboltAuthorViewController()
-        navigationController?.pushViewController(aboutVc, animated: true)
+        
     }
     
     func cleanCacheViewClick() {
