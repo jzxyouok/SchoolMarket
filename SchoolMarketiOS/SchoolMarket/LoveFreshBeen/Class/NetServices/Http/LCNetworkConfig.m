@@ -8,7 +8,7 @@
 //  Copyright © 2015年 GZLC. All rights reserved.
 //
 
-#define BASE_URL @"www"
+#define BASE_URL @"10.255.70:8080/SchoolMarketWeb"
 
 #import "LCNetworkConfig.h"
 #import "YTKNetworkConfig.h"

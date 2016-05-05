@@ -109,8 +109,11 @@ class RAMItemAnimation: NSObject, RAMItemAnimationProtocol {
 class AnimationTabBarController: UITabBarController {
     
     var iconsView: [(icon: UIImageView, textLabel: UILabel)] = []
-    var iconsImageName:[String] = ["v2_home", "v2_order", "shopCart", "v2_my"]
-    var iconsSelectedImageName:[String] = ["v2_home_r", "v2_order_r", "shopCart_r", "v2_my_r"]
+//    var iconsImageName:[String] = ["v2_home", "v2_order", "shopCart", "v2_my"]
+//    var iconsSelectedImageName:[String] = ["v2_home_r", "v2_order_r", "shopCart_r", "v2_my_r"]
+    var iconsImageName:[String] = ["v2_order", "shopCart", "v2_my"]
+    var iconsSelectedImageName:[String] = ["v2_order_r", "shopCart_r", "v2_my_r"]
+   
     var shopCarIcon: UIImageView?
     
     override func viewDidLoad() {
@@ -209,13 +212,19 @@ class AnimationTabBarController: UITabBarController {
                     textLabel.bounds.size.width = textLabelWidth
                 }
                 
-                if 2 == index {
+//                if 2 == index {
+//                    let redDotView = ShopCarRedDotView.sharedRedDotView
+//                    redDotView.frame = CGRectMake(imageH + 1, -3, 15, 15)
+//                    icon.addSubview(redDotView)
+//                    shopCarIcon = icon
+//                }
+                
+                if 1 == index {
                     let redDotView = ShopCarRedDotView.sharedRedDotView
                     redDotView.frame = CGRectMake(imageH + 1, -3, 15, 15)
                     icon.addSubview(redDotView)
                     shopCarIcon = icon
                 }
-                
                 let iconsAndLabels = (icon:icon, textLabel:textLabel)
                 iconsView.append(iconsAndLabels)
                 
@@ -246,7 +255,15 @@ class AnimationTabBarController: UITabBarController {
     
     func setSelectIndex(from from: Int,to: Int) {
         
-        if to == 2 {
+//        if to == 2 {
+//            let vc = childViewControllers[selectedIndex]
+//            let shopCar = ShopCartViewController()
+//            let nav = BaseNavigationController(rootViewController: shopCar)
+//            vc.presentViewController(nav, animated: true, completion: nil)
+//            
+//            return
+//        }
+        if to == 1 {
             let vc = childViewControllers[selectedIndex]
             let shopCar = ShopCartViewController()
             let nav = BaseNavigationController(rootViewController: shopCar)
@@ -254,6 +271,7 @@ class AnimationTabBarController: UITabBarController {
             
             return
         }
+
         
         selectedIndex = to
         let items = tabBar.items as! [RAMAnimatedTabBarItem]

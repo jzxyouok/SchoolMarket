@@ -202,6 +202,9 @@
 		DD6954441CD8AD41008782A6 /* LCAccount.m in Sources */ = {isa = PBXBuildFile; fileRef = DD6954411CD8AD41008782A6 /* LCAccount.m */; };
 		DD6954451CD8AD41008782A6 /* UserProfileItems.m in Sources */ = {isa = PBXBuildFile; fileRef = DD6954431CD8AD41008782A6 /* UserProfileItems.m */; };
 		DD6954491CD8ADF3008782A6 /* BaseVerificationModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DD6954481CD8ADF3008782A6 /* BaseVerificationModel.m */; };
+		DDE9A4591CDAD29B00837195 /* vvvVIewco.m in Sources */ = {isa = PBXBuildFile; fileRef = DDE9A4581CDAD29B00837195 /* vvvVIewco.m */; };
+		DDE9A45B1CDAD56B00837195 /* LoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE9A45A1CDAD56B00837195 /* LoginService.swift */; };
+		DDE9A45D1CDAD85700837195 /* LoginItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDE9A45C1CDAD85700837195 /* LoginItem.swift */; };
 		FAF9AECE1C008BE000EDFC75 /* HotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF9AECD1C008BE000EDFC75 /* HotView.swift */; };
 		FAF9AED31C00934400EDFC75 /* HeadResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF9AED21C00934400EDFC75 /* HeadResources.swift */; };
 		FAF9AED61C0096B500EDFC75 /* SwiftDictModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF9AED51C0096B500EDFC75 /* SwiftDictModel.swift */; };
@@ -505,6 +508,10 @@
 		DD6954431CD8AD41008782A6 /* UserProfileItems.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfileItems.m; sourceTree = "<group>"; };
 		DD6954471CD8ADF3008782A6 /* BaseVerificationModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseVerificationModel.h; sourceTree = "<group>"; };
 		DD6954481CD8ADF3008782A6 /* BaseVerificationModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseVerificationModel.m; sourceTree = "<group>"; };
+		DDE9A4571CDAD29B00837195 /* vvvVIewco.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vvvVIewco.h; sourceTree = "<group>"; };
+		DDE9A4581CDAD29B00837195 /* vvvVIewco.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vvvVIewco.m; sourceTree = "<group>"; };
+		DDE9A45A1CDAD56B00837195 /* LoginService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginService.swift; sourceTree = "<group>"; };
+		DDE9A45C1CDAD85700837195 /* LoginItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginItem.swift; sourceTree = "<group>"; };
 		E372C8047ED1AE2C27FB8CCD /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		F4EB10C6FBD193A56A882E0F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		FAF9AECD1C008BE000EDFC75 /* HotView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotView.swift; sourceTree = "<group>"; };
@@ -1265,7 +1272,11 @@
 				DD69542E1CD8ABFC008782A6 /* CentralProcessingHandler.h */,
 				DD69542F1CD8ABFC008782A6 /* CentralProcessingHandler.m */,
 				DD6954301CD8ABFC008782A6 /* LCNetworkConfig.h */,
+				DDE9A45C1CDAD85700837195 /* LoginItem.swift */,
 				DD6954311CD8ABFC008782A6 /* LCNetworkConfig.m */,
+				DDE9A4571CDAD29B00837195 /* vvvVIewco.h */,
+				DDE9A4581CDAD29B00837195 /* vvvVIewco.m */,
+				DDE9A45A1CDAD56B00837195 /* LoginService.swift */,
 			);
 			path = Http;
 			sourceTree = "<group>";
@@ -1594,6 +1605,7 @@
 				B37DCD8F1C0EDE1F005D3C7A /* MainAD.swift in Sources */,
 				B3DE24711C449C9A000A18C2 /* SearchView.swift in Sources */,
 				B3A20CDC1C06C5E500E1EAF4 /* UIImageView+WebCache.m in Sources */,
+				DDE9A4591CDAD29B00837195 /* vvvVIewco.m in Sources */,
 				B31252771BFC79EB0098B995 /* AppDelegate.swift in Sources */,
 				B389F8D31C0E90AF007B2C9A /* MJRefreshAutoGifFooter.m in Sources */,
 				B3A20CE11C06DB8300E1EAF4 /* Supermarket.swift in Sources */,
@@ -1627,6 +1639,7 @@
 				B3B279201C1E9A6900C35E76 /* HelpViewController.swift in Sources */,
 				DD6954321CD8ABFC008782A6 /* BaseRequest.m in Sources */,
 				B35C1DA51BFD8853006260D0 /* UIBarButtonItem+Extension.swift in Sources */,
+				DDE9A45B1CDAD56B00837195 /* LoginService.swift in Sources */,
 				B389F8DA1C0E90AF007B2C9A /* MJRefreshNormalHeader.m in Sources */,
 				B3A20CDA1C06C5E500E1EAF4 /* UIImage+WebP.m in Sources */,
 				B3A7BBC11C32723E00700207 /* MyAdressViewController.swift in Sources */,
@@ -1659,6 +1672,7 @@
 				B3A20CD21C06C5E500E1EAF4 /* SDWebImageDecoder.m in Sources */,
 				B3C4E31F1C02B4D60025074D /* IconImageTextView.swift in Sources */,
 				B35C1DA91BFD89E7006260D0 /* UpImageDownTextButton.swift in Sources */,
+				DDE9A45D1CDAD85700837195 /* LoginItem.swift in Sources */,
 				B37A7AAB1C3F7165000C0A52 /* UserInfo.swift in Sources */,
 				B37739011C1AB70C00FEDC9F /* FileToll.swift in Sources */,
 				B32235351C0445D5006EADE7 /* DiscountPriceView.swift in Sources */,

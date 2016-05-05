@@ -32,7 +32,7 @@ class AnimationViewController: BaseViewController {
         self.animationLayers?.append(transitionLayer)
         
         let p1 = transitionLayer.position;
-        let p3 = CGPointMake(view.width - view.width / 4 - view.width / 8 - 6, self.view.layer.bounds.size.height - 40);
+        let p3 = CGPointMake(view.width - view.width / 3 - view.width / 6 - 6, self.view.layer.bounds.size.height - 40);
         
         let positionAnimation = CAKeyframeAnimation(keyPath: "position")
         let path = CGPathCreateMutable();

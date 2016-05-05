@@ -7,8 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-//#import "UploadFileRequest.h"
-//#import "UpdateFaceItems.h"
 #import "BaseVerificationModel.h"
 @class YTKChainRequest;
 @class YTKBaseRequest;

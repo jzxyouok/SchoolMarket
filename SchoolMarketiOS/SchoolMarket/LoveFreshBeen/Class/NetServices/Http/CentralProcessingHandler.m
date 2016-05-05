@@ -497,7 +497,7 @@ typedef NS_ENUM(NSInteger, RequestType)
         
         NSAssert([targetDic isKindOfClass:[NSDictionary class]], @"链式请求：服务器返回格式出错");
         NSLog(@"-----链式请求的api:%@,model名:%@,返回的数据:%@",identify,modelName,targetDic);
-        BaseVerificationModel *model = [NSClassFromString(modelName) objectWithKeyValues:targetDic];
+        BaseVerificationModel *model = [NSClassFromString(modelName) mj_objectWithKeyValues:targetDic];
         if (model)
         {
             if (model.ret_code != 200)

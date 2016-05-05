@@ -47,6 +47,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         buildKeyWindow()
         
+        //初始化网络
+        LCNetworkConfig.sharedInstance()
+        
+        LoginService.login("gg", password: "123", sBlock: { (res,time) in
+            
+            }) { (aaaa, dd) in
+                
+        }
         return true
     }
     

@@ -22,6 +22,9 @@ class LoginViewController: BaseViewController {
     }
     
 
+    func configData() {
+        
+    }
     /*
     // MARK: - Navigation
 
