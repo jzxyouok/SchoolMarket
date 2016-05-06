@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1F9AC75134A4B43CF4749056 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CF34CCA0CEE5B75F2890547 /* libPods.a */; };
+		928903811CDC8B5E005A6728 /* RegisterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928903801CDC8B5E005A6728 /* RegisterTextField.swift */; };
 		B30354731C4F2BCB00666956 /* GuideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30354721C4F2BCB00666956 /* GuideViewController.swift */; };
 		B30354751C4F2D7E00666956 /* GuideCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30354741C4F2D7E00666956 /* GuideCell.swift */; };
 		B30A4C751C50E9DF00C5CAD2 /* UMSocialLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B30A4C401C50E9DF00C5CAD2 /* UMSocialLocalizable.strings */; };
@@ -234,6 +235,7 @@
 
 /* Begin PBXFileReference section */
 		7CF34CCA0CEE5B75F2890547 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		928903801CDC8B5E005A6728 /* RegisterTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterTextField.swift; sourceTree = "<group>"; };
 		B30354721C4F2BCB00666956 /* GuideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuideViewController.swift; sourceTree = "<group>"; };
 		B30354741C4F2D7E00666956 /* GuideCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuideCell.swift; sourceTree = "<group>"; };
 		B30A4C411C50E9DF00C5CAD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/UMSocialLocalizable.strings; sourceTree = "<group>"; };
@@ -1160,6 +1162,7 @@
 			children = (
 				DD6954111CD8AAB6008782A6 /* LoginViewController.swift */,
 				DD6954141CD8AAD6008782A6 /* RegisterViewController.swift */,
+				928903801CDC8B5E005A6728 /* RegisterTextField.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -1591,6 +1594,7 @@
 				B37DCD941C0EE228005D3C7A /* ADViewController.swift in Sources */,
 				B3B134C01BFEF11B004C60AE /* HomeTableHeadView.swift in Sources */,
 				B3715BEE1C101F020028080B /* Mine.swift in Sources */,
+				928903811CDC8B5E005A6728 /* RegisterTextField.swift in Sources */,
 				B31252BC1BFC7B820098B995 /* Theme.swift in Sources */,
 				B3AE62651C31089900A321FC /* OrderDetailView.swift in Sources */,
 				B395BA5E1C59B27B009FB41A /* CostDetailView.swift in Sources */,

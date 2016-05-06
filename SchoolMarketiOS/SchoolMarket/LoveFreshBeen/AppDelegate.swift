@@ -79,15 +79,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func loadADRootViewController() {
-        adViewController = ADViewController()
+//        adViewController = ADViewController()
+//        
+//        weak var tmpSelf = self
+//        MainAD.loadADData { (data, error) -> Void in
+//            if data?.data?.img_name != nil {
+//                tmpSelf!.adViewController!.imageName = data!.data!.img_name
+//                tmpSelf!.window?.rootViewController = self.adViewController
+//            }
+//        }
         
-        weak var tmpSelf = self
-        MainAD.loadADData { (data, error) -> Void in
-            if data?.data?.img_name != nil {
-                tmpSelf!.adViewController!.imageName = data!.data!.img_name
-                tmpSelf!.window?.rootViewController = self.adViewController
-            }
-        }
+        window!.rootViewController = LoginViewController()
     }
     
     func addNotification() {
@@ -108,17 +110,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Action
     func showMainTabbarControllerSucess(noti: NSNotification) {
         let adImage = noti.object as! UIImage
-        let mainTabBar = MainTabBarController()
-        mainTabBar.adImage = adImage
+        let mainTabBar = LoginViewController()
+//        mainTabBar.adImage = adImage
         window?.rootViewController = mainTabBar
     }
     
     func showMainTabbarControllerFale() {
-        window!.rootViewController = MainTabBarController()
+        window!.rootViewController = LoginViewController()
     }
     
     func shoMainTabBarController() {
-        window!.rootViewController = MainTabBarController()
+        window!.rootViewController = LoginViewController()
     }
     
     // MARK:- privete Method
