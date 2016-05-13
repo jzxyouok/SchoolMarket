@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.SMWebSer.Domain.CallBack;
 import com.SMWebSer.Domain.User;
 import com.SMWebSer.Utils.ServiceUtil;
 import com.SMWebSer.service.Service;
@@ -34,30 +35,37 @@ public class RegisteServlet extends HttpServlet {
     	
     	String name = request.getParameter("name");
     	String password = request.getParameter("password");
-    	int user_id = validRegist(name, password, "default.jpg");
-    	//返回给客户端已注册用户的id,>0则被注册了
-    	JSONObject jsonObject = new JSONObject();
-    	try {
-			jsonObject.put("user_id", user_id);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	out.write(jsonObject.toString());
-    	System.out.println(jsonObject.toString());
+    	CallBack callback = validRegist(name, password, "default.jpg");
+    	
+    	Gson gson = new Gson();
+    	out.write(gson.toJson(callback));
+    	System.out.println(gson.toJson(callback));
     }
     
     //查找是否该用户名已经被注册了，若有返回已注册用户名
-    public int validRegist(String name,String password,String imageName){
+    public CallBack validRegist(String name,String password,String imageName){
+    	CallBack callback = new CallBack();
+    	
     	User user = new User(name,password,imageName);
-    	User user_find = service.validLogin(name, password);
+    	User user_find = service.validRegist(name);
+    	//用户名存在了，则返回代码为401，和用户的ID
     	if(user_find != null){
+    		//将已注册的用户名的ID转成json格式
+    		JSONObject jsonObject = new JSONObject();
+    		try {
+				jsonObject.put("user_id", user_find.getId());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		callback = new CallBack(401,"该用户名已被注册",jsonObject);
     		System.out.print("该用户名已被注册！");
-    		return user_find.getId();
+    		return callback;
     	}else{
     		service.addUser(user);
+    		callback = new CallBack(201,"注册成功",null);
     		System.out.println("注册成功！");
     	}
-    	return -1;
+    	return callback;
     }
 }

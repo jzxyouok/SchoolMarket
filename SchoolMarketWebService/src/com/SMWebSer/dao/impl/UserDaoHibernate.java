@@ -25,4 +25,14 @@ public class UserDaoHibernate extends BaseDaoHibernate4<User> implements UserDao
 
 	}
 
+	@Override
+	public User findUserByName(String name) {
+		String hql = "select distinct user from User user where user.name = ?0";
+		List<User> users = find(hql,name);
+		if(users.size() == 1){
+			return users.get(0);
+		}
+		return null;
+	}
+
 }

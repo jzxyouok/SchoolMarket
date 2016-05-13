@@ -39,10 +39,19 @@ public class ServiceImpl implements Service{
 		}
 		return null;
 	}
-
+	
 	@Override
 	public void UpdateUser(String name, String imageName) {
 		userDao.UpdateUser(name, imageName);
+	}
+
+	@Override
+	public User validRegist(String name) {
+		User user = userDao.findUserByName(name);
+		if(user != null){
+			return user;
+		}
+		return null;
 	}
 
 }
