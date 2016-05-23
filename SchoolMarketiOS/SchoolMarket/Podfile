@@ -1,7 +1,11 @@
-platform :ios, '7.0'
-pod "SVProgressHUD"
+platform :ios, '8.0'
+use_frameworks!
+
 pod 'AFNetworking', '~> 2.0'
 pod 'MJExtension'
-pod 'MLTransition', '~> 2.0.1'
 pod 'Masonry', '~> 0.6.3'
 pod 'YTKNetwork'
+pod 'Alamofire'
+pod 'SwiftyJSON'
+pod 'MBProgressHUD'
+pod 'SVProgressHUD'

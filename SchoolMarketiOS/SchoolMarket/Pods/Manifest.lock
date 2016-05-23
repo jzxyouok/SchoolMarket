@@ -22,29 +22,35 @@ PODS:
   - AFNetworking/UIKit (2.6.3):
     - AFNetworking/NSURLConnection
     - AFNetworking/NSURLSession
+  - Alamofire (3.4.0)
   - Masonry (0.6.4)
+  - MBProgressHUD (0.9.2)
   - MJExtension (3.0.10)
-  - MLTransition (2.0.1)
   - SVProgressHUD (2.0.3)
-  - YTKNetwork (1.0.0):
+  - SwiftyJSON (2.3.2)
+  - YTKNetwork (1.1.0):
     - AFDownloadRequestOperation (~> 2.0)
     - AFNetworking (~> 2.0)
 
 DEPENDENCIES:
   - AFNetworking (~> 2.0)
+  - Alamofire
   - Masonry (~> 0.6.3)
+  - MBProgressHUD
   - MJExtension
-  - MLTransition (~> 2.0.1)
   - SVProgressHUD
+  - SwiftyJSON
   - YTKNetwork
 
 SPEC CHECKSUMS:
   AFDownloadRequestOperation: 748a1643423e1ddb23f2178f778087d4f0ae8ac7
   AFNetworking: cb8d14a848e831097108418f5d49217339d4eb60
+  Alamofire: c19a627cefd6a95f840401c49ab1f124e07f54ee
   Masonry: 281802d04d787ea2973179ee8bcb50500579ede2
+  MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
   MJExtension: d86aacb740c87519d20e3cca55b6fa4be6cc7548
-  MLTransition: 47b87b8bc6077540919dcfc3e0adcc0b4a589910
   SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
-  YTKNetwork: 28ef7a3c119f61e737a76abbe74ff2fe1afec913
+  SwiftyJSON: 04ccea08915aa0109039157c7974cf0298da292a
+  YTKNetwork: a41c1df80d4f3b9d05c19c514a2c604e7a6ac341
 
 COCOAPODS: 0.39.0

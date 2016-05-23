@@ -14,12 +14,17 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>MJExtension.xcscheme</key>
+		<key>Alamofire.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>MLTransition.xcscheme</key>
+		<key>MBProgressHUD.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>MJExtension.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -39,6 +44,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>SwiftyJSON.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>YTKNetwork.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -47,42 +57,52 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>18963E48DC4192515DB631F1CBF5AFDD</key>
+		<key>1C151E445DBA8CEFD839741AEECC0BE5</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>28EDA0AC3272A77B0575F728B99261BC</key>
+		<key>4149B3939C0744EA82CEFABA9C67D6A1</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>30674244CCF15691D99478B43A334ACA</key>
+		<key>69B9AEDCFF8E6E1D6276C414353FC10E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>53480ED0BE09FF49E34B1702D485CAAB</key>
+		<key>742BF6D339CC20CF429D3E18039D8264</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>694D3812C504C32D3C466B4C5BE2296A</key>
+		<key>79C040AFDDCE1BCBF6D8B5EB0B85887F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>9EAB3E42EF957541E6C3C76D35FD008E</key>
+		<key>7C0126D717EB28DC6DB2EEA2E20B5172</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>B3C760711B585710870482548EF04B3F</key>
+		<key>80B1DCC01E0BED2ED8A3ED5B6EBFD768</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>C54F4DCEBB44BE969B719E9E479A389B</key>
+		<key>A9A83F63385AA43314397B8DD375464B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C7CD75F463B00CA78D18FEA0B86ED69D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E61CE3B6DFA1FE6B3E296965C76C0E10</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -82,3 +82,26 @@ strip_invalid_archs() {
   fi
 }
 
+
+if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "Pods/AFDownloadRequestOperation.framework"
+  install_framework "Pods/AFNetworking.framework"
+  install_framework "Pods/Alamofire.framework"
+  install_framework "Pods/MBProgressHUD.framework"
+  install_framework "Pods/MJExtension.framework"
+  install_framework "Pods/Masonry.framework"
+  install_framework "Pods/SVProgressHUD.framework"
+  install_framework "Pods/SwiftyJSON.framework"
+  install_framework "Pods/YTKNetwork.framework"
+fi
+if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "Pods/AFDownloadRequestOperation.framework"
+  install_framework "Pods/AFNetworking.framework"
+  install_framework "Pods/Alamofire.framework"
+  install_framework "Pods/MBProgressHUD.framework"
+  install_framework "Pods/MJExtension.framework"
+  install_framework "Pods/Masonry.framework"
+  install_framework "Pods/SVProgressHUD.framework"
+  install_framework "Pods/SwiftyJSON.framework"
+  install_framework "Pods/YTKNetwork.framework"
+fi
