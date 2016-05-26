@@ -17,11 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         NSThread.sleepForTimeInterval(1.0)
         
-        setUM()
+//        setUM()
         
         setAppSubject()
         
-        addNotification()
+//        addNotification()
         
         buildKeyWindow()
         
@@ -45,7 +45,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.rootViewController = GuideViewController()
             NSUserDefaults.standardUserDefaults().setObject("isFristOpenApp", forKey: "isFristOpenApp")
         } else {
-            loadADRootViewController()
+//            loadADRootViewController()
+            let act:LCAccount = LCAccount.sharedInstance()
+            if act.logined {
+                window!.rootViewController = MainTabBarController()
+            }else {
+                window!.rootViewController = LoginViewController()
+            }
         }
     }
     
@@ -63,11 +69,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = LoginViewController()
     }
     
-    func addNotification() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showMainTabbarControllerSucess:", name: ADImageLoadSecussed, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "showMainTabbarControllerFale", name: ADImageLoadFail, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "shoMainTabBarController", name: GuideViewControllerDidFinish, object: nil)
-    }
+//    func addNotification() {
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AppDelegate.showMainTabbarControllerSucess(_:)), name: ADImageLoadSecussed, object: nil)
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AppDelegate.showMainTabbarControllerFale), name: ADImageLoadFail, object: nil)
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AppDelegate.shoMainTabBarController), name: GuideViewControllerDidFinish, object: nil)
+//    }
     
     func setUM() {
         UMSocialData.setAppKey("569f662be0f55a0efa0001cc")
@@ -78,21 +84,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UMSocialConfig.hiddenNotInstallPlatforms([UMShareToWechatSession, UMShareToQzone, UMShareToQQ, UMShareToSina, UMShareToWechatTimeline])
     }
     
-    // MARK: - Action
-    func showMainTabbarControllerSucess(noti: NSNotification) {
-        let adImage = noti.object as! UIImage
-        let mainTabBar = LoginViewController()
-//        mainTabBar.adImage = adImage
-        window?.rootViewController = mainTabBar
-    }
-    
-    func showMainTabbarControllerFale() {
-        window!.rootViewController = LoginViewController()
-    }
-    
-    func shoMainTabBarController() {
-        window!.rootViewController = LoginViewController()
-    }
+//    // MARK: - Action
+//    func showMainTabbarControllerSucess(noti: NSNotification) {
+//        _ = noti.object as! UIImage
+//        let mainTabBar = LoginViewController()
+////        mainTabBar.adImage = adImage
+//        window?.rootViewController = mainTabBar
+//    }
+//    
+//    func showMainTabbarControllerFale() {
+//        window!.rootViewController = LoginViewController()
+//    }
+//    
+//    func shoMainTabBarController() {
+//        window!.rootViewController = LoginViewController()
+//    }
     
     // MARK:- privete Method
     // MARK:主题设置

@@ -59,7 +59,7 @@ class RegisterViewController: BaseNavigationController {
         signInBtn.setTitle("注册", forState: UIControlState.Normal)
         signInBtn.backgroundColor = UIColor(red:100/255.0 ,green:45/255.0 ,blue:60/255.0 ,alpha:0.75)
         textFieldView!.addSubview(signInBtn)
-        signInBtn.addTarget(self, action: "signInBtnOnClick", forControlEvents: UIControlEvents.TouchDown)
+        signInBtn.addTarget(self, action: #selector(RegisterViewController.signInBtnOnClick), forControlEvents: UIControlEvents.TouchDown)
     }
     
     func signInBtnOnClick()

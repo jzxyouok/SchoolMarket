@@ -90,13 +90,14 @@ class SettingViewController: BaseViewController {
         view.addSubview(logoutView)
         
         let logoutLabel = UILabel(frame: CGRectMake(0, 0, ScreenWidth, subViewHeight))
+        logoutLabel.userInteractionEnabled = true
         logoutLabel.text = "退出当前账号"
         logoutLabel.textColor = UIColor.colorWithCustom(60, g: 60, b: 60)
         logoutLabel.font = UIFont.systemFontOfSize(15)
         logoutLabel.textAlignment = NSTextAlignment.Center
         logoutView.addSubview(logoutLabel)
         
-        let tap = UITapGestureRecognizer(target: self, action: "logoutViewClick")
+        let tap = UITapGestureRecognizer(target: self, action: #selector(SettingViewController.logoutViewClick))
         logoutLabel.addGestureRecognizer(tap)
     }
     
@@ -114,5 +115,10 @@ class SettingViewController: BaseViewController {
         }
     }
     
-    func logoutViewClick() {}
+    func logoutViewClick() {
+        let act = LCAccount.sharedInstance()
+        act.logined = false
+        let login = LoginViewController()
+        self.presentViewController(login, animated:true, completion: nil)
+    }
 }

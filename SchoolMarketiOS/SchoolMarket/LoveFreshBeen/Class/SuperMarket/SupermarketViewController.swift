@@ -51,7 +51,7 @@ class SupermarketViewController: SelectedAdressViewController {
     }
     
     private func addNotification() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "shopCarBuyProductNumberDidChange", name: LFBShopCarBuyProductNumberDidChangeNotification, object: nil)   
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(SupermarketViewController.shopCarBuyProductNumberDidChange), name: LFBShopCarBuyProductNumberDidChangeNotification, object: nil)   
     }
     
     func shopCarBuyProductNumberDidChange() {

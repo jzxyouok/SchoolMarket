@@ -7,13 +7,16 @@
 //
 
 import UIKit
-
+import Alamofire
+import SwiftyJSON
 class LoginViewController: BaseNavigationController {
     
     private var bacImage:UIImageView?
     private var logoView:UIView?
     private var textFieldView:UIView?
     private var shareView:UIView?
+    private var mobileField:UITextField!
+    private var passwordField:UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,15 +70,15 @@ class LoginViewController: BaseNavigationController {
         textFieldView?.addSubview(lineView)
         
         //两个TextField
-        let field1 = UITextField(frame: CGRectMake(mar, 0, view.width-mar*2, marTextHeight))
-        field1.placeholder = "手机号码"
-        bacView.addSubview(field1)
-        let field2 = UITextField(frame:CGRectMake(mar,marTextHeight,view.width-mar*2,marTextHeight))
-        field2.secureTextEntry = true
-        field2.placeholder = "密码"
-        field1.tag = 10001
-        field2.tag = 10002
-        bacView.addSubview(field2)
+        mobileField = UITextField(frame: CGRectMake(mar, 0, view.width-mar*2, marTextHeight))
+        mobileField.placeholder = "手机号码"
+        bacView.addSubview(mobileField)
+        passwordField = UITextField(frame:CGRectMake(mar,marTextHeight,view.width-mar*2,marTextHeight))
+        passwordField.secureTextEntry = true
+        passwordField.placeholder = "密码"
+        mobileField.tag = 10001
+        passwordField.tag = 10002
+        bacView.addSubview(passwordField)
         
         //登陆Btn
         let marBtnHeight = marTextHeight
@@ -84,7 +87,7 @@ class LoginViewController: BaseNavigationController {
         loginBtn.setTitle("登陆", forState: UIControlState.Normal)
         loginBtn.backgroundColor = UIColor(red:100/255.0 ,green:45/255.0 ,blue:60/255.0 ,alpha:0.75)
         textFieldView?.addSubview(loginBtn)
-        loginBtn.addTarget(self, action: "loginBtnOnClick", forControlEvents: UIControlEvents.TouchDown)
+        loginBtn.addTarget(self, action: #selector(LoginViewController.loginBtnOnClick), forControlEvents: UIControlEvents.TouchDown)
         
     }
     
@@ -103,7 +106,7 @@ class LoginViewController: BaseNavigationController {
         signUpBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
         signUpBtn.titleLabel?.font = UIFont(name: "Helvetica-Bold",size: 15)
         shareView?.addSubview(signUpBtn)
-        signUpBtn.addTarget(self, action: "signUpBtnOnClick", forControlEvents: UIControlEvents.TouchDown)
+        signUpBtn.addTarget(self, action: #selector(LoginViewController.signUpBtnOnClick), forControlEvents: UIControlEvents.TouchDown)
         
         let shareBtn = UIButton(frame: CGRectMake((view.width-btnWidth)/2, 50, btnWidth, 20))
         shareBtn.setTitle("使用第三方登录", forState: UIControlState.Normal)
@@ -112,14 +115,21 @@ class LoginViewController: BaseNavigationController {
         shareBtn.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
         shareBtn.titleLabel?.font = UIFont(name: "Helvetica-Bold",size: 12)
         shareView?.addSubview(shareBtn)
-        shareBtn.addTarget(self, action: "shareBtnOnClick", forControlEvents: UIControlEvents.TouchDown)
+        shareBtn.addTarget(self, action: #selector(LoginViewController.shareBtnOnClick), forControlEvents: UIControlEvents.TouchDown)
     }
     
     //Btn点击事件
     func loginBtnOnClick()
     {
+        //改变本地登录状态
+        let act:LCAccount = LCAccount.sharedInstance()
+        act.logined = true
+        
+        SVProgressHUD.showSuccessWithStatus("登陆成功")
         let mainVC = MainTabBarController()
         self.presentViewController(mainVC, animated: true, completion: nil)
+        //先判断下数据的合法性
+//        requestLogin()
     }
     
     func signUpBtnOnClick()
@@ -136,10 +146,11 @@ class LoginViewController: BaseNavigationController {
     
     //收起键盘
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        let field1:UITextField = view.viewWithTag(10001) as! UITextField
-        field1.resignFirstResponder()
-        let field2:UITextField = view.viewWithTag(10002) as! UITextField
-        field2.resignFirstResponder()
+//        let field1:UITextField = view.viewWithTag(10001) as! UITextField
+//        field1.resignFirstResponder()
+//        let field2:UITextField = view.viewWithTag(10002) as! UITextField
+//        field2.resignFirstResponder()
+        view.endEditing(true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -149,8 +160,32 @@ class LoginViewController: BaseNavigationController {
 
     
 
-    func configData() {
-        
+    func requestLogin() {
+        Alamofire.request(.GET, "",parameters: ["name":mobileField.text!,"password":passwordField.text!])
+            .responseJSON { response in
+                if let value = response.result.value {
+                    print("\(value)")
+                }
+                switch (response.result) {
+                case .Success:
+                    let json = JSON(response.result.value!)
+                    let status = json["status"]
+                    let message = json["message"]
+                    if status.intValue != 200 {
+                        SVProgressHUD.showErrorWithStatus("\(message)")
+                    }else {
+                        //改变本地登录状态
+                        let act:LCAccount = LCAccount.sharedInstance()
+                        act.logined = true
+                        SVProgressHUD.showSuccessWithStatus("登陆成功")
+                        let mainVC = MainTabBarController()
+                        self.presentViewController(mainVC, animated: true, completion: nil)
+                    }
+                case .Failure(let error):
+                    SVProgressHUD.showErrorWithStatus("登录失败")
+                    print("\(error)")
+                }
+        }
     }
     /*
     // MARK: - Navigation
