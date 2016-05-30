@@ -1,33 +1,43 @@
 /**
- * 对顾客信息操作的类
+ *  销售情况显示面板
+ *  
+ *  日期：2016-05-01
+ *  
+ *  实现功能: 1.可以显示查看销售的信息
+ *  	    2.销售的报表统计
  */
+
+
 package com.model;
 
-import com.db.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.Vector;
 
-import javax.swing.table.*;
-import java.util.*;
-import java.sql.*;
+import javax.swing.table.AbstractTableModel;
+
+import com.db.SqlHelper;
 
 @SuppressWarnings("serial")
-public class CustomModel extends AbstractTableModel{
-	
+public class SellModel  extends AbstractTableModel{
+
 	Vector<String> colums;// 列
 	@SuppressWarnings("rawtypes")
 	Vector<Vector> rows;// 行
 
-	// 用于查询需要显示的员工信息
+	// 用于查询需要显示的销售信息
 	@SuppressWarnings("rawtypes")
-	public void query(String sql, String paras[]) {
+	public void query(String sql, String[] paras) {
 		// 初始化列，及每一列的名字
 		this.colums = new Vector<String>();
 		
-		colums.add("顾客编号");
-		colums.add("姓        名");
-		colums.add("性        别");
-		colums.add("电        话");
-		colums.add("收货地址");
-		colums.add("登录密码");
+		colums.add("产品编号");
+		colums.add("产品名称");
+		colums.add("产品价格");
+		colums.add("销售数量");
+		colums.add("合计金额");
+		colums.add("出售日期");
+		colums.add("产品种类");
 		
 		this.rows = new Vector<Vector>();
 		// 创建sqlhelper对象
@@ -36,16 +46,14 @@ public class CustomModel extends AbstractTableModel{
 		try {
 
 			// 从rs对象中可以得到一个ResultSetMetaData
-			// rsmt可以的到结果有多少列，而且可以知道每列的名字，加入表头的信息
-			ResultSetMetaData rsmt = rs.getMetaData();
-//			for (int i = 0; i < rsmt.getColumnCount(); i++) {
-//				this.colums.add(rsmt.getColumnName(i + 1));
-//			}
+			// rsmt可以得到结果有多少列，而且可以知道每列的名字，加入表头的信息
+			ResultSetMetaData rsmt =  rs.getMetaData();
 			// 把rs的结果放入到rows
 			while (rs.next()) {
 
 				Vector<String> temp = new Vector<String>();
 				for (int i = 0; i < rsmt.getColumnCount(); i++) {
+					
 					temp.add(rs.getString(i + 1));
 				}
 				rows.add(temp);
@@ -55,25 +63,15 @@ public class CustomModel extends AbstractTableModel{
 			e.printStackTrace();
 		} finally {
 			sh.close();
-		}	
+		}
+		
 	}
 	
-	// 顾客信息更新，包含增删改
-	public boolean Customupdate(String sql, String[] paras) {
-		
-		boolean b = false;
-		SqlHelper sh = new SqlHelper();
-		b = sh.update(sql, paras);
-		
-		return b;
-	}
 	
-	// 用一个字段来查询
-	public boolean checkid(String id) {
+	// 查询函数，返回一个布尔值
+	public static boolean check(String sql, String[] paras) {
 		
 		boolean b = false;
-		String sql = "select count(*) from custominfo where Cid = ?";
-		String []paras = {id};
 		SqlHelper sh=new SqlHelper();
 		try {
 			
@@ -81,8 +79,7 @@ public class CustomModel extends AbstractTableModel{
 			if(rs.next())
 			{
 				//如果进去，则比较
-				System.out.println(rs.getInt(1));
-				if (rs.getInt(1) == 1) {
+				if (rs.getInt(1) >= 1) {
 					
 					b = true;
 				}
@@ -95,11 +92,30 @@ public class CustomModel extends AbstractTableModel{
 		}
 		return b;
 	}
-	@Override
-	public String getColumnName(int column) {
-		// TODO Auto-generated method stub
-		return this.colums.get(column);
+	
+	// 得到想要的数值
+	public static double find(String sql, String[] paras) {
+		
+		double i = 0.0;
+		SqlHelper sh=new SqlHelper();
+		try {
+			
+			ResultSet rs = sh.query(sql, paras);
+			while(rs.next())
+			{
+				//如果进去，则取出第一个值
+				i = rs.getDouble(1);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			sh.close();
+		}
+		
+		return i;
 	}
+	
 
 	public int getRowCount() {
 		// TODO Auto-generated method stub
@@ -116,5 +132,4 @@ public class CustomModel extends AbstractTableModel{
 		// TODO Auto-generated method stub
 		return ((Vector) rows.get(rowIndex)).get(columnIndex);
 	}
-
 }

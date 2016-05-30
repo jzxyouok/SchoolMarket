@@ -27,7 +27,7 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 	JToggleButton max;
 	
 	// 窗口菜单
-	JLabel merchant,custom, product,stcok;
+	JLabel merchant,custom, product,salecount;
 	
 	JPanel conjp;
 	CardLayout card;
@@ -77,7 +77,7 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 		jMenu.setPreferredSize(new Dimension((int)(width*0.55), 62));
 		jMenu.setOpaque(false);
 		
-		String [] nameStrings = {"商家信息", "顾客信息", "产品信息", "库存信息"};
+		String [] nameStrings = {"商家信息", "顾客信息", "产品信息", "销售信息"};
 		
 		merchant = CreateMenuLabel(merchant, nameStrings[0], jMenu);
 		merchant.setForeground(Color.yellow);
@@ -86,8 +86,8 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 		custom.setName("custom");
 		product = CreateMenuLabel(product, nameStrings[2], jMenu);
 		product.setName("product");
-		stcok = CreateMenuLabel(stcok, nameStrings[3], jMenu);
-		stcok.setName("stock");
+		salecount = CreateMenuLabel(salecount, nameStrings[3], jMenu);
+		salecount.setName("stock");
 		
 		// 为了方便布局使用的空面板
 		jMenu1 = new JPanel();
@@ -149,19 +149,22 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 			MerchantInfo merinfo = new MerchantInfo();
 			
 			// 顾客信息面板
-//++			CustomInfo cusinfo = new CustomInfo();
+			CustomInfo cusinfo = new CustomInfo();
 			
 			// 产品相关管理面板
 			ProductInfo proinfo = new ProductInfo();
 			
-			// 库存信息面板
+			// 销售信息面板
+			
+			SellInfo selinfo=new SellInfo();
 			
 			// conjp.add(empInfo, "empInfo"), 里面的字符串是个标识符，卡片不分先后
 			// 不过值得注意的是第一个加入的会在窗口实例化的时候显示为第一个
 			
 			conjp.add(merinfo, "merinfo");
-//++			conjp.add(cusinfo, "cusinfo");
+			conjp.add(cusinfo, "cusinfo");
 			conjp.add(proinfo, "proinfo");
+			conjp.add(selinfo, "selinfo");
 			
 		}
 		// 创建背景图片面板
@@ -232,8 +235,8 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 			}
 			if (type.equals("click")) {
 				
-				String [] name = {"merchant", "custom", "product", "stcok"};
-				JLabel [] jlb1 = {merchant,custom, product,stcok};
+				String [] name = {"merchant", "custom", "product", "salecount"};
+				JLabel [] jlb1 = {merchant,custom, product,salecount};
 				for (int i = 0; i < name.length; i++) {
 					
 					if (jlb.getName().equals(name[0])) {
@@ -307,6 +310,12 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 				setTopMenuStyle(product, "click");
 				this.card.show(conjp, "proinfo");
 			}
+			
+			if (e.getSource() == salecount) {
+				
+				setTopMenuStyle(salecount, "click");
+				this.card.show(conjp, "selinfo");
+			}
 		}
 		
 		@Override
@@ -350,6 +359,10 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 				
 				setTopMenuStyle(product, "enter");
 			}
+			if (e.getSource() == this.salecount) {
+				
+				setTopMenuStyle(salecount, "enter");
+			}
 		}
 		@Override
 		public void mouseExited(MouseEvent e) {
@@ -381,6 +394,10 @@ public class MainWindows extends JFrame implements ActionListener, MouseListener
 			if (e.getSource() == this.product) {
 				
 				setTopMenuStyle(product, "exit");
+			}
+			if (e.getSource() == this.salecount) {
+				
+				setTopMenuStyle(salecount, "exit");
 			}
 		}
 		@Override

@@ -1,50 +1,48 @@
-/**
- * 用于显示和管理顾客信息的面板
- */
 package com.view;
+
 import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+
+import com.model.MerchantModel;
+import com.model.CustomModel;
 import com.mytools.*;
-import com.model.*;
 
 @SuppressWarnings("serial")
-public class CustomInfo extends JPanel implements MouseListener, FocusListener, KeyListener{
+public class CustomInfo extends JPanel implements ActionListener, MouseListener, FocusListener {
+	
 	 // 用于获得窗口的大小
 	final static int width=Toolkit.getDefaultToolkit().getScreenSize().width;
 	final static int height=Toolkit.getDefaultToolkit().getScreenSize().height;
 	// 公用颜色值
 	Color color = new Color(22, 120, 195);
-	
+
 	// 显示信息的面板
 	JPanel showtabel, showinfoall, showinfo, handle;
-	// 确定添加按钮放置面板
 	JPanel jadd;
+	JButton addc;
 	// 装载信息面板的面板
 	JPanel showjp;
 	JTable Customtable = null;
-	
 
-	JButton add, addc, modify, delete;
+	JButton add, modify, delete;
 	
 	// 右侧面板组件
 	JLabel id, name, sex, phone, address, cpasswd; 
 	
-	JTextField idt, namet,  phonet, addresst, cpasswdt;
+	JTextField idt, namet, phonet, addresst, cpasswdt;
 	JRadioButton boy, gril;
-	ButtonGroup sext;
-
-	CustomModel cus=new CustomModel();
-	CustomModel cusnew = new CustomModel();	 
-
+	
 	//定义一个鼠标指针的类型
 	Cursor myCursor=new Cursor(Cursor.HAND_CURSOR);//手型鼠标
 	
 	JScrollPane jsp;
 	
-	String []paras={"1"};
+	CustomModel cus = new CustomModel();
+	CustomModel cusnew = new CustomModel();
+	String paras[] = {"1"};
 	
 	public void setbutton(JButton jb) {
 		
@@ -59,7 +57,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		
 		showinfo.add(jlb);
 		jlb.setFont(MyFont.Infolab);
-		jlb.setForeground(Color.WHITE);
+		jlb.setForeground(Color.white);
 	}
 	private void setjtf(final JTextField jtf) {
 		
@@ -70,31 +68,32 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		jtf.setFont(MyFont.Infotext);
 		jtf.setForeground(Color.white);
 	}
+	
 	public CustomInfo() {
 		
 		// 处理左侧
 		//1.设计jtable
-		cus.query("select Cid, Cname, Sex, Phone, Address Cpasswd from custominfo where 1=?", paras);
+		cus = new CustomModel();
+		cus.query("select Cid, Cname, Sex, Phone, Address, Cpasswd from custominfo where 1=?", paras);
 		Customtable = new JTable(cus);
 		
 		// 调用工具Tools类中的设置表格样式方法
 		Tools.setTableStyle(Customtable);
 		Customtable.addMouseListener(this);
-		Customtable.addKeyListener(this);
-		Customtable.setOpaque(false);
 		
 		// 滚动面板
-		jsp = new JScrollPane(Customtable);
+		jsp=new JScrollPane(Customtable);
 		jsp.setBorder(new MatteBorder(0, 1, 1, 0, color));
 		Tools.setJspStyle(jsp);
 		
 		showtabel = new JPanel(new BorderLayout());
 		showtabel.setBackground(Color.white);
-		// 设置边框
-		MatteBorder border = new MatteBorder(0, 1, 1, 0, color);
+		// 设置只有左边框
+		MatteBorder border = new MatteBorder(0, 1, 1, 0, new Color(22, 120, 195));
 		showtabel.setBorder(border);
 		// 设置面板的大小
 		showtabel.setPreferredSize(new Dimension((int)(width*0.8)-250, (int)(height*0.8)-155));
+		
 		
 		showtabel.add(jsp);
 		
@@ -105,13 +104,13 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		handle.setBorder(border2);
 		handle.setOpaque(false);
 		add = new JButton(new ImageIcon("image/add.png"));
-		//add.setToolTipText("添加一条员工信息");
+		add.setToolTipText("添加一条信息");
 		setbutton(add);
 		modify = new JButton(new ImageIcon("image/modify.png"));
-		//modify.setToolTipText("修改员工的信息");
+		modify.setToolTipText("修改信息");
 		setbutton(modify);
 		delete = new JButton(new ImageIcon("image/del.png"));
-		//delete.setToolTipText("删除选中的员工");
+		delete.setToolTipText("删除选中的信息");
 		setbutton(delete);
 		
 		handle.add(add);
@@ -123,9 +122,11 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		showjp.add(showtabel, "Center");
 		showjp.add(handle, "South");
 		
+		
 		// 处理右侧
+	
 		showinfo = new JPanel(new GridLayout(9, 2, -90, 30));
-		showinfo.setPreferredSize(new Dimension(350, (int)(height*0.8)-85));
+		showinfo.setPreferredSize(new Dimension(350, (int)(height*0.8)));
 		showinfo.setOpaque(false);
 		
 		// 第一列
@@ -151,7 +152,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		gril.setOpaque(false);
 		gril.setFocusPainted(false);
 		gril.setBorderPainted(false);
-		sext = new ButtonGroup();
+		ButtonGroup sext = new ButtonGroup();
 		sext.add(boy);
 		sext.add(gril);
 		JPanel sextp = new JPanel(new GridLayout(1, 2));
@@ -165,11 +166,12 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		phonet =new JTextField(10);
 		setjtf(phonet);
 		
-		address = new JLabel(" 收货地址");
+		address = new JLabel(" 联系地址");
 		setlab(address);
 		addresst = new JTextField(10);
 		setjtf(addresst);
 		addresst.setFont(new Font("新宋体",Font.PLAIN,13));
+		
 		
 		cpasswd = new JLabel(" 登录密码");
 		setlab(cpasswd);
@@ -199,26 +201,14 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		this.add(showinfoall, "East");
 		this.setVisible(true);
 	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == Customtable) {
 			
-			cusnew.query("select * from custominfo where 1 = ?", paras);
-			idt.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 0));
-			idt.setEditable(false);
-			idt.setForeground(Color.lightGray);
-			namet.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 1));
-			// 设置性别的显示
-			if (cusnew.getValueAt(Customtable.getSelectedRow(), 2).equals("男")) {
-				boy.setSelected(true);
-			}else {
-				gril.setSelected(true);
-			}
-			phonet.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 3));
-			addresst.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 4));
-			cpasswdt.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 5));
 			
+			showmes();
 			addc.setVisible(false);
 			delete.setEnabled(true);
 			modify.setEnabled(true);
@@ -232,19 +222,18 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 			idt.setEditable(true);
 			idt.setForeground(Color.WHITE);
 			namet.setText("");
-			//boy.setSelected(false);
 			gril.setSelected(true);
 			phonet.setText("");
 			addresst.setText("");
 			cpasswdt.setText("");
 			
 			addc.setVisible(true);
-			Customtable.clearSelection();
 			delete.setEnabled(false);
 			modify.setEnabled(false);
 			
 			idt.addFocusListener(this);
 		}
+		
 		if (e.getSource() == addc) {
 			
 			// 1.得到信息
@@ -258,7 +247,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 				
 				str3 = gril.getText();
 			}
-			
+		
 			String str4 = phonet.getText();
 			String str5 = addresst.getText();
 			String str6 = cpasswdt.getText();
@@ -274,7 +263,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 			// 3.添加操作
 			String[] newparas={str1, str2, str3, str4, str5, str6};
 			String sql="insert into custominfo values (?, ?, ?, ?, ?, ?)";
-			boolean result = cusnew.Customupdate(sql, newparas);
+			boolean result = cusnew. Customupdate(sql, newparas);
 			if (result) {
 				
 				JOptionPane.showMessageDialog(this, "<html><font size = '5' color = 'blue'>添加成功");
@@ -290,6 +279,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 		if (e.getSource() == modify) {
 			
 			if (modify.isEnabled()) {
+
 				int selrow=Customtable.getSelectedRow();
 				int i = Customtable.getSelectedRowCount();
 				while(i > 1)
@@ -297,7 +287,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 					JOptionPane.showMessageDialog(this, "只能操作一行数据，请选中一行操作");
 					return;
 				}
-				while(selrow==-1)
+				if(selrow == -1)
 				{
 					JOptionPane.showMessageDialog(this, "请选择一行，再进行操作");
 					return;
@@ -314,7 +304,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 					
 					str3 = gril.getText();
 				}
-				
+			
 				String str4 = phonet.getText();
 				String str5 = addresst.getText();
 				String str6 = cpasswdt.getText();
@@ -331,24 +321,31 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 					return;
 					
 				}
-				String[] newparas={str2, str3, str4, str5, str6, str1};
-				String sql="update custominfo set Cname=?,Sex=?,Phone=?,Adress=?,Cpasswd=? where Cid=?";
-				CustomModel cusnew = new CustomModel();
-				boolean result = cusnew.Customupdate(sql, newparas);
-				if (result) {
+				int y = JOptionPane.showConfirmDialog(this, "确定要修改吗？", "温馨提示", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				if (y == 1) {
 					
-					JOptionPane.showMessageDialog(this, "<html><font size = '4' color = 'blue'>修改成功");
+					return;
 				}else {
 					
-					JOptionPane.showMessageDialog(this, "<html><font size = '5' color = red>抱歉的通知您，修改没有成功!</font>" +
-							"<br />请检查信息是否符合要求！<br />");
+					String[] newparas={str2, str3, str4, str5, str6, str1};
+					String sql="update ccustominfo set Cname=?,Sex=?,Phone=?,Adress=?,Cpasswd=? where Cid=?";
+					MerchantModel mernew = new MerchantModel();
+					boolean result = mernew.Merchantupdate(sql, newparas);
+					if (result) {
+						
+						JOptionPane.showMessageDialog(this, "<html><font size = '5'>　修改成功");
+					}else {
+						
+						JOptionPane.showMessageDialog(this, "<html><font size = '5' color = red>抱歉的通知您，修改没有成功!</font>" +
+								"<br />请检查信息是否符合要求！<br />" );
+					}
+					cus = new CustomModel();
+					cus.query("select Cid, Cname, Sex, Phone, Address, Cpasswd from custominfo where 1 = ?", paras);
+					Customtable.setModel(cus);
 				}
-				cus = new CustomModel();
-				cus.query("select Cid, Cname, Sex, Phone, Address,Cpasswd from custominfo where 1 = ?", paras);
-				Customtable.setModel(cus);
 			}
-
 		}
+		
 		if (e.getSource() == delete) {
 			
 			if (delete.isEnabled()) {
@@ -365,7 +362,7 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 					JOptionPane.showMessageDialog(this, "请选择一行，再进行操作");
 					return;
 				}
-				int j = JOptionPane.showConfirmDialog(this, "<html><font size = '5'>是否要删除选中顾客信息？<br /><br /><font size = '5' color = 'red'>请注意慎重操作<br /><br />", "温馨提示", 
+				int j = JOptionPane.showConfirmDialog(this, "<html><font size = '5'>是否要删除选中员工信息？<br /><br /><font size = '5' color = 'red'>请注意慎重操作<br /><br />", "温馨提示", 
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 				if (j == 0) {
 					
@@ -374,7 +371,6 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 					boolean result = cusnew.Customupdate(sql, eid);
 					if (result) {
 						
-
 						JOptionPane.showMessageDialog(this, "<html><font size = '5' color = 'blue'>恭喜您，删除成功啦");
 						cus = new CustomModel();
 						cus.query("select Cid, Cname, Sex, Phone, Address, Cpasswd from custominfo where 1 = ?", paras);
@@ -390,118 +386,129 @@ public class CustomInfo extends JPanel implements MouseListener, FocusListener, 
 			}
 		}
 	}
-		@Override
-		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
+	
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == add) {
 			
+			add.setIcon(new ImageIcon("image/addC.png"));
 		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
+		if (e.getSource() == addc) {
 			
+			addc.setIcon(new ImageIcon("image/addconfirmC.png"));
 		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-			if (e.getSource() == add) {
-				
-				add.setIcon(new ImageIcon("image/addC.png"));
-			}
-			if (e.getSource() == addc) {
-				
-				addc.setIcon(new ImageIcon("image/addconfirmC.png"));
-			}
-			if (e.getSource() == modify) {
-				
-				modify.setIcon(new ImageIcon("image/modifyC.png"));
-			}
-			if (e.getSource() == delete) {
-				
-				delete.setIcon(new ImageIcon("image/delC.png"));
-			}
+		if (e.getSource() == modify) {
+			
+			modify.setIcon(new ImageIcon("image/modifyC.png"));
 		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
-			if (e.getSource() == add) {
-				
-				add.setIcon(new ImageIcon("image/add.png"));
-			}
-			if (e.getSource() == addc) {
-				
-				addc.setIcon(new ImageIcon("image/addconfirm.png"));
-			}
-			if (e.getSource() == modify) {
-				
-				modify.setIcon(new ImageIcon("image/modify.png"));
-			}
-			if (e.getSource() == delete) {
-				
-				delete.setIcon(new ImageIcon("image/del.png"));
-			}
+		if (e.getSource() == delete) {
+			
+			delete.setIcon(new ImageIcon("image/delC.png"));
+		}
+	}
+	
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getSource() == add) {
+			
+			add.setIcon(new ImageIcon("image/add.png"));
+		}
+		if (e.getSource() == addc) {
+			
+			addc.setIcon(new ImageIcon("image/addconfirm.png"));
+		}
+		if (e.getSource() == modify) {
+			
+			modify.setIcon(new ImageIcon("image/modify.png"));
+		}
+		if (e.getSource() == delete) {
+			
+			delete.setIcon(new ImageIcon("image/del.png"));
+		}
+	}
+	
+	// 信息判断函数
+	private boolean mesconfirm() {
+		
+		boolean b = false;
+		if (idt.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 0)) 
+				&& namet.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 1)) 
+				&& phonet.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 3))
+				&& addresst.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 4))
+				&& cpasswdt.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 5))
+			) 
+		{
+			b = true;
 		}
 		
-		// 信息判断函数
-		private boolean mesconfirm() {
-			
-			boolean b = false;
-			if (idt.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 0)) 
-					&& namet.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 1)) 
-					&& phonet.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(),3 ))
-					&& addresst.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 4))
-					&& cpasswdt.getText().equals((String)cusnew.getValueAt(Customtable.getSelectedRow(), 5))
-				) 
-			{
-				b = true;
-			}
-			
-			return b;
+		return b;
+	}
+	
+	// 信息显示函数
+	private void showmes() {
+		
+		cusnew.query("select * from custominfo where 1 = ?", paras);
+		idt.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 0));
+		idt.setEditable(false);
+		idt.setForeground(Color.lightGray);
+		namet.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 1));
+		// 设置性别的显示
+		if (cusnew.getValueAt(Customtable.getSelectedRow(), 2).equals("男")) {
+			boy.setSelected(true);
+		}else {
+			gril.setSelected(true);
 		}
-		@Override
-		public void focusGained(FocusEvent e) {
-			// TODO Auto-generated method stub
-
+		phonet.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 3));
+		addresst.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(), 4));
+		cpasswdt.setText((String)cusnew.getValueAt(Customtable.getSelectedRow(),5));
+	}
+	
+	@Override
+	public void focusGained(FocusEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void focusLost(FocusEvent e) {
+		// TODO Auto-generated method stub
+		Component comp =e.getComponent();
+		if (comp instanceof JTextField) {
 			
-		}
-		@Override
-		public void focusLost(FocusEvent e) {
-			// TODO Auto-generated method stub
-			Component comp =e.getComponent();
-			if (comp instanceof JTextField) {
+			if (!idt.getText().trim().isEmpty()) {
 				
-				if (!idt.getText().trim().isEmpty()) {
+				if (!Tools.isNum(idt.getText().trim()) || Integer.valueOf(idt.getText().trim()) < 0) {
 					
-					if (!Tools.isNum(idt.getText().trim()) || Integer.valueOf(idt.getText().trim()) < 0) {
-							
-							JOptionPane.showMessageDialog(this, "<html>顾客编号只能由数字组成，请重新输入！");
-							return;
-					} else {
+					JOptionPane.showMessageDialog(this, "<html>会员编号只能由数字组成，请重新输入！");
+					return;
+				}else {
+					
+					if (cusnew.checkid(idt.getText().trim())) {
 						
-						if (cusnew.checkid(idt.getText().trim())) {
-							
-							JOptionPane.showMessageDialog(this, "<html><br /><font size = '5'>抱歉的通知您，顾客编号:<font color = 'red'>"+idt.getText()+"</font>已经存在　<br/>请输入其他的再试！<br />");
-						}
+						JOptionPane.showMessageDialog(this, "<html><br /><font size = '5'>抱歉的通知您，会员编号:<font color = 'red'>"+idt.getText()+"</font>已经存在　<br/>请输入其他的再试！<br />");
 					}
-
 				}
+
 			}
 		}
-		@Override
-		public void keyTyped(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void keyPressed(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		@Override
-		public void keyReleased(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }
