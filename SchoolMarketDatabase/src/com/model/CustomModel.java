@@ -8,7 +8,6 @@ import com.db.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.sql.*;
-
 @SuppressWarnings("serial")
 public class CustomModel extends AbstractTableModel{
 	
@@ -25,7 +24,7 @@ public class CustomModel extends AbstractTableModel{
 		colums.add("顾客编号");
 		colums.add("姓        名");
 		colums.add("性        别");
-		colums.add("电        话");
+		colums.add("电        话 ");
 		colums.add("收货地址");
 		colums.add("登录密码");
 		
@@ -57,8 +56,7 @@ public class CustomModel extends AbstractTableModel{
 			sh.close();
 		}	
 	}
-	
-	// 顾客信息更新，包含增删改
+	// 员工信息更新，包含增删改
 	public boolean Customupdate(String sql, String[] paras) {
 		
 		boolean b = false;
@@ -116,5 +114,4 @@ public class CustomModel extends AbstractTableModel{
 		// TODO Auto-generated method stub
 		return ((Vector) rows.get(rowIndex)).get(columnIndex);
 	}
-
 }
